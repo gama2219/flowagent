@@ -13,7 +13,7 @@ import { Workflow, MessageSquare, Sparkles, Plus } from "lucide-react"
 
 export default function DashboardPage() {
   const { user, profile, loading,session } = useAuth()
-  const {workflows,createWorkflow,create_session} = useWorkflows()
+  const {workflows,create_session} = useWorkflows()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSessionId, setActiveSessionId] = useState(null)
   const [activeSession, setActiveSession] = useState(null)
@@ -47,17 +47,27 @@ export default function DashboardPage() {
   const handleWorkflowSelect = async (selection) => {
     try {
       // If creating a new workflow, create it first
+      let payload;
       if (selection.type === "new") {
-        const newWorkflow = await createWorkflow({
-          name: selection.workflowName
-        })
+        payload = {
+          extra:false,
+          workflow_id:null
+        }
+
+        const newWorkflow = await create_session(selection.workflowName,payload)
         let workflowId = newWorkflow.thread_id
         setActiveSessionId(workflowId)
         setActiveSession(newWorkflow)
         setShowWorkflowSelector(false)
 
       }else{
-        const workflow =  create_session(selection.workflowName)
+
+        payload = {
+          extra:true,
+          workflow_id:selection.workflowId
+        }
+
+        const workflow = await create_session(selection.workflowName,payload)
         setActiveSessionId(workflow.thread_id)
         setActiveSession(workflow)
         setShowWorkflowSelector(false)
@@ -106,7 +116,7 @@ export default function DashboardPage() {
                     <Sparkles className="h-12 w-12 text-primary" />
                   </div>
                 </div>
-                <h1 className="text-3xl font-bold mb-4 text-balance">Welcome to AI Workflow Builder</h1>
+                <h1 className="text-3xl font-bold mb-4 text-balance">Welcome to flowagent</h1>
                 <p className="text-lg text-muted-foreground text-pretty mb-8">
                   Create powerful n8n automation workflows using natural language conversations. Start by creating a new
                   workflow chat session.
@@ -127,9 +137,9 @@ export default function DashboardPage() {
                 <Card className="p-6">
                   <CardContent className="p-0">
                     <MessageSquare className="h-8 w-8 text-primary mb-3" />
-                    <h3 className="font-semibold mb-2">Multiple Sessions</h3>
+                    <h3 className="font-semibold mb-2">Workflow Maintenance</h3>
                     <p className="text-sm text-muted-foreground">
-                      Handle AI hallucinations with multiple chat sessions per workflow for better results.
+                      Easily update node configurations or integrate new services with guided assistance.
                     </p>
                   </CardContent>
                 </Card>

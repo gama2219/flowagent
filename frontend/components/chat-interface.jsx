@@ -33,20 +33,6 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
 
   // Add welcome message if no messages exist
   useEffect(() => {
-    if (!loadingMessages && messages.length === 0) {
-      addLocalMessage({
-        type: "ai",
-        content: `Hello! I'm ready to help you build your "${workflowName}" workflow. 
-
-I can help you:
-• Design workflow structures and logic
-• Connect different services and APIs  
-• Set up triggers and automation rules
-• Optimize workflow performance
-
-What would you like this automation to do? Describe your requirements in natural language and I'll create the perfect n8n workflow for you.`
-      })
-    }
     if (loadingMessages){
       setLoading(false)
     }

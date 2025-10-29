@@ -35,58 +35,6 @@ export function useWorkflows() {
      return
   }
 
-  const createWorkflow = async (workflowData) => {
-    const _newWorkflow = {
-      "name": workflowData.name,
-      "nodes": [
-  ],
-  "connections": {
-
-  },
-  "settings": {
-    "saveExecutionProgress": true,
-    "saveManualExecutions": true,
-    "saveDataErrorExecution": "all",
-    "saveDataSuccessExecution": "all",
-    "executionTimeout": 3600,
-    "errorWorkflow": "VzqKEW0ShTXA5vPj",
-    "timezone": "America/New_York",
-    "executionOrder": "v1"
-  }
-}
-    
-
-
-
-     try {
-
-
-        const response = await fetch('/api/n8n/workflows',{
-          method:'POST',
-          headers:{
-            "Content-Type": "application/json",
-          },
-          body:JSON.stringify(
-            {
-              "n8n_endpoint":profile?.n8n_endpoint,
-              "n8n_key":profile?.n8n_key,
-              "workflow_json":JSON.stringify(_newWorkflow)
-            }
-          )
-        })
-
-        let the_new_created_workflow = await response.json()
-       const newWorkflow = await workflowService.createWorkflow(the_new_created_workflow.name)
-       console.log(newWorkflow)
-       setWorkflows((prev) => [newWorkflow, ...prev])
-       return newWorkflow
-      
-     } catch (err) {
-       console.error("Error creating workflow:", err)
-       throw err
-     }
-  }
-
   const getsession = async (wokflowname) => {
 
     const workflow = await workflowService.getsession(wokflowname)
@@ -94,9 +42,9 @@ export function useWorkflows() {
 
   }
 
-  const create_session = async (workflowname) => {
+  const create_session = async (workflowname,payload) => {
     try{
-    const newWorkflow = await workflowService.createWorkflow(workflowname)
+    const newWorkflow = await workflowService.createWorkflow(workflowname,payload)
     setWorkflows((prev) => [newWorkflow, ...prev])
     return newWorkflow
   }catch (err){
@@ -113,7 +61,6 @@ export function useWorkflows() {
     //sessions,
     loading,
     error,
-    createWorkflow,
     getsession,
     create_session,
    // updateSession,

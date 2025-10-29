@@ -32,7 +32,7 @@ export class WorkflowService {
   }
 
   
-  async createWorkflow(session_name) {
+  async createWorkflow(session_name,payload) {
 
     const res = await fetch(
       '/api/langgraph/create-session',
@@ -44,6 +44,7 @@ export class WorkflowService {
         body:JSON.stringify({
           n8n_api_key:this.n8n_api_key,
           session_name:session_name,
+          payload:payload,
           auth:this.auth
         })
       }
@@ -128,149 +129,4 @@ export class WorkflowService {
 
   }
 
-
-
-
-
-  async updateWorkflow(workflowId, updates) {
-    const workflow = this.mockData.workflows.find((w) => w.id === workflowId)
-    if (workflow) {
-      Object.assign(workflow, updates)
-    }
-    return Promise.resolve(workflow)
-
-    // const { data, error } = await this.supabase.from("workflows").update(updates).eq("id", workflowId).select().single()
-    // if (error) throw error
-    // return data
-  }
-
-  async deleteWorkflow(workflowId) {
-    this.mockData.workflows = this.mockData.workflows.filter((w) => w.id !== workflowId)
-    return Promise.resolve()
-
-    // const { error } = await this.supabase.from("workflows").delete().eq("id", workflowId)
-    // if (error) throw error
-  }
-
-  async getChatSessions(workflowname = null) {
-
-
-    const sessions=await this.client.threads.search({ metadata: { thread_name: workflowname}})
-    return sessions[0]
-
-    // let query = this.supabase
-    //   .from("chat_sessions")
-    //   .select(`
-    //     *,
-    //     workflows (
-    //       id,
-    //       name,
-    //       n8n_workflow_id
-    //     )
-    //   `)
-    //   .eq("user_id", userId)
-    //   .order("created_at", { ascending: false })
-
-    // if (workflowId) {
-    //   query = query.eq("workflow_id", workflowId)
-    // }
-
-    // const { data, error } = await query
-    // if (error) throw error
-    // return data
-  }
-
-  async createChatSession(userId, sessionData) {
-    const workflow = this.mockData.workflows.find((w) => w.id === sessionData.workflow_id)
-    const newSession = {
-      id: Date.now(),
-      user_id: userId,
-      workflow_id: sessionData.workflow_id,
-      session_name: sessionData.session_name,
-      is_active: true,
-      created_at: new Date().toISOString(),
-      workflows: workflow ? { id: workflow.id, name: workflow.name, n8n_workflow_id: workflow.n8n_workflow_id } : null,
-    }
-    this.mockData.sessions.unshift(newSession)
-    return Promise.resolve(newSession)
-
-    // const { data, error } = await this.supabase
-    //   .from("chat_sessions")
-    //   .insert([
-    //     {
-    //       user_id: userId,
-    //       workflow_id: sessionData.workflow_id,
-    //       session_name: sessionData.session_name,
-    //       is_active: true,
-    //     },
-    //   ])
-    //   .select(`
-    //     *,
-    //     workflows (
-    //       id,
-    //       name,
-    //       n8n_workflow_id
-    //     )
-    //   `)
-    //   .single()
-
-    // if (error) throw error
-    // return data
-  }
-
-  async updateChatSession(sessionId, updates) {
-    const session = this.mockData.sessions.find((s) => s.id === sessionId)
-    if (session) {
-      Object.assign(session, updates)
-    }
-    return Promise.resolve(session)
-
-    // const { data, error } = await this.supabase
-    //   .from("chat_sessions")
-    //   .update(updates)
-    //   .eq("id", sessionId)
-    //   .select()
-    //   .single()
-
-    // if (error) throw error
-    // return data
-  }
-
-  async deleteChatSession(sessionId) {
-    this.mockData.sessions = this.mockData.sessions.filter((s) => s.id !== sessionId)
-    return Promise.resolve()
-
-    // const { error } = await this.supabase.from("chat_sessions").delete().eq("id", sessionId)
-    // if (error) throw error
-  }
-
-
-  async createMessage(sessionId, messageData) {
-    const newMessage = {
-      id: Date.now(),
-      session_id: sessionId,
-      role: messageData.role,
-      content: messageData.content,
-      metadata: messageData.metadata || {},
-      created_at: new Date().toISOString(),
-    }
-    this.mockData.messages.push(newMessage)
-    return Promise.resolve(newMessage)
-
-    // const { data, error } = await this.supabase
-    //   .from("messages")
-    //   .insert([
-    //     {
-    //       session_id: sessionId,
-    //       role: messageData.role,
-    //       content: messageData.content,
-    //       metadata: messageData.metadata || {},
-    //     },
-    //   ])
-    //   .select()
-    //   .single()
-
-    // if (error) throw error
-    // return data
-  }
 }

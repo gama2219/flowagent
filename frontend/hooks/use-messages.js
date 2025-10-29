@@ -3,23 +3,7 @@
 import { useState, useEffect } from "react"
 import { WorkflowService } from "@/lib/supabase/workflows"
 import { useAuth } from "./use-auth"
-/*
-initial setup of messages to be deleted after full customization
-    {
-      id: 1,
-      session_id: sessionId,
-      role: "user",
-      content: "Help me create an email automation workflow",
-      created_at: "2024-01-15T10:35:00Z",
-    },
-    {
-      id: 2,
-      session_id: sessionId,
-      role: "assistant",
-      content: "I'll help you create an email automation workflow. What kind of emails do you want to automate?",
-      created_at: "2024-01-15T10:36:00Z",
-    },
-*/
+
 
 export function useMessages(sessionId) {
   const [messages, setMessages] = useState([])

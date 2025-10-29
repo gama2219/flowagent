@@ -4,14 +4,7 @@ import { N8nClient } from "@/lib/n8n/client"
 
 export async function GET(request) {
   try {
-    const mockWorkflows = [
-      { id: 1, name: "Email Automation", active: true, createdAt: "2024-01-15" },
-      { id: 2, name: "Data Processing", active: false, createdAt: "2024-01-10" },
-      { id: 3, name: "Slack Notifications", active: true, createdAt: "2024-01-05" },
-    ]
-
-    //return NextResponse.json({ workflows: mockWorkflows })
-
+ 
      const supabase = await createClient()
 
      // Get current user

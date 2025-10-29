@@ -108,10 +108,9 @@ export  function  AuthProvider({ children,account_profile,session_,user_}) {
 
   const updateProfile = async (updates) => {
     setProfile({ ...profile, ...updates })
-
      if (!user) return { error: "No user logged in" }
 
-     const { data, error } = await supabase.from("profiles").update(updates).eq("id", user.id).select().single()
+     const { data, error } = await supabase.from("profiles").update(updates).eq("id",user.id).select().single()
      
 
      if (!error) {
