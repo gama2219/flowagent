@@ -29,6 +29,7 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
         scrollContainer.scrollTop = scrollContainer.scrollHeight
       }
     }
+    console.log(messages)
   }, [messages])
 
   // Add welcome message if no messages exist
@@ -137,7 +138,8 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
                   message.type === "human" ? "bg-primary text-primary-foreground" : "bg-card",
                 )}
               >
-                <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
+                {/*Array.isArray(message.content) ? message.content[0].text : message.content this is specifically based on the gemini output structure */}
+                <div className="whitespace-pre-wrap text-sm leading-relaxed">{Array.isArray(message.content) ? message.content[0].text : message.content}</div>
               </Card>
 
               {message.type === "human" && (
