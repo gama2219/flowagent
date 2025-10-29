@@ -14,7 +14,7 @@ prompt_n8n_agent=prompt_template_n8n_agent.invoke({"tools": tools})
 
 
 model = ChatGoogleGenerativeAI(
-    model='gemini-2.0-flash-lite',
+    model='gemini-2.5-pro',
     temperature=1,
     google_api_key=google_api_key
 )
