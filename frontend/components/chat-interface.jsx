@@ -29,7 +29,6 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
         scrollContainer.scrollTop = scrollContainer.scrollHeight
       }
     }
-    console.log(messages)
   }, [messages])
 
   // Add welcome message if no messages exist
@@ -76,7 +75,6 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
         type: "ai",
         content:
           "I apologize, but I encountered an error processing your request. Please try again or rephrase your question.",
-        created_at: new Date().toISOString(),
       })
     } finally {
       setLoading(false)
