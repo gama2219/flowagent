@@ -11,17 +11,18 @@ import { useMessages } from "@/hooks/use-messages"
 import { Bot, Loader2, Workflow, Send, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { WorkflowService } from "@/lib/supabase/workflows"
+import { ErrorToast } from "./error-toast"
 
 export function ChatInterface({ sessionId, sessionName, workflowName }) {
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
-  const { user,profile,session} = useAuth()
+  const [error, setError] = useState(null)
+  const { user, profile, session } = useAuth()
   const { messages, loading: loadingMessages, addMessage, addLocalMessage } = useMessages(sessionId)
   const scrollAreaRef = useRef(null)
   const textareaRef = useRef(null)
-  const workflowService = new WorkflowService(profile?.n8n_key,session?.access_token)
+  const workflowService = new WorkflowService(profile?.n8n_key, session?.access_token)
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollAreaRef.current) {
       const scrollContainer = scrollAreaRef.current.querySelector("[data-radix-scroll-area-viewport]")
@@ -31,12 +32,10 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
     }
   }, [messages])
 
-  // Add welcome message if no messages exist
   useEffect(() => {
-    if (loadingMessages){
+    if (loadingMessages) {
       setLoading(false)
     }
-
   }, [loadingMessages, messages, workflowName, addLocalMessage])
 
   const handleSubmit = async (e) => {
@@ -48,33 +47,33 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
       content: input.trim(),
     }
 
-    // Add user message immediately
     addLocalMessage({
-      ...userMessage
+      ...userMessage,
     })
 
     setInput("")
     setLoading(true)
+    setError(null)
 
     try {
-      // Send message to AI chat API
+      const response = await workflowService.chat_invoke(userMessage.content, sessionId)
 
-      const response = await workflowService.chat_invoke(userMessage.content,sessionId)
-
-      // Add AI response
       addLocalMessage({
         type: "ai",
-        content: response
+        content: response,
       })
-
     } catch (error) {
       console.error("Error sending message:", error)
 
-      // Add error message
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to send message. Please check your connection and try again."
+
+      setError(errorMessage)
+
       addLocalMessage({
         type: "ai",
         content:
-          "I apologize, but I encountered an error processing your request. Please try again or rephrase your question.",
+          "I apologize, but I encountered an error processing your request. Please check your connection and try again.",
       })
     } finally {
       setLoading(false)
@@ -100,9 +99,9 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Chat Header */}
-      <div className="border-b border-border p-4">
+      <div className="border-b border-border p-4 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <Workflow className="h-5 w-5 text-primary" />
@@ -114,62 +113,65 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
         </div>
       </div>
 
-      {/* Messages */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
-        <div className="space-y-4 max-w-4xl mx-auto">
-          {messages.map((message, index) => (
-            <div
-              key={message.id || index}
-              className={cn("flex gap-3", message.type === "human" ? "justify-end" : "justify-start")}
-            >
-              {(message.type === "ai") && (
-                <Avatar className="h-8 w-8 bg-primary/10">
+      {/* Messages - scrollable area */}
+      <ScrollArea ref={scrollAreaRef} className="flex-1 overflow-hidden">
+        <div className="p-4">
+          <div className="space-y-4 max-w-4xl mx-auto">
+            {messages.map((message, index) => (
+              <div
+                key={message.id || index}
+                className={cn("flex gap-3", message.type === "human" ? "justify-end" : "justify-start")}
+              >
+                {message.type === "ai" && (
+                  <Avatar className="h-8 w-8 bg-primary/10 flex-shrink-0">
+                    <AvatarFallback>
+                      <Bot className="h-4 w-4 text-primary" />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+
+                <Card
+                  className={cn(
+                    "max-w-[80%] p-4",
+                    message.type === "human" ? "bg-primary text-primary-foreground" : "bg-card",
+                  )}
+                >
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                    {Array.isArray(message.content) ? message.content[0].text : message.content}
+                  </div>
+                </Card>
+
+                {message.type === "human" && (
+                  <Avatar className="h-8 w-8 bg-secondary flex-shrink-0">
+                    <AvatarFallback>
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+              </div>
+            ))}
+
+            {loading && (
+              <div className="flex gap-3 justify-start">
+                <Avatar className="h-8 w-8 bg-primary/10 flex-shrink-0">
                   <AvatarFallback>
                     <Bot className="h-4 w-4 text-primary" />
                   </AvatarFallback>
                 </Avatar>
-              )}
-
-              <Card
-                className={cn(
-                  "max-w-[80%] p-4",
-                  message.type === "human" ? "bg-primary text-primary-foreground" : "bg-card",
-                )}
-              >
-                {/*Array.isArray(message.content) ? message.content[0].text : message.content this is specifically based on the gemini output structure */}
-                <div className="whitespace-pre-wrap text-sm leading-relaxed">{Array.isArray(message.content) ? message.content[0].text : message.content}</div>
-              </Card>
-
-              {message.type === "human" && (
-                <Avatar className="h-8 w-8 bg-secondary">
-                  <AvatarFallback>
-                    <User className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
-              )}
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex gap-3 justify-start">
-              <Avatar className="h-8 w-8 bg-primary/10">
-                <AvatarFallback>
-                  <Bot className="h-4 w-4 text-primary" />
-                </AvatarFallback>
-              </Avatar>
-              <Card className="max-w-[80%] p-4 bg-card">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm text-muted-foreground">Thinking...</span>
-                </div>
-              </Card>
-            </div>
-          )}
+                <Card className="max-w-[80%] p-4 bg-card">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Thinking...</span>
+                  </div>
+                </Card>
+              </div>
+            )}
+          </div>
         </div>
       </ScrollArea>
 
-      {/* Input Area */}
-      <div className="border-t border-border p-4">
+      {/* Input Area - fixed at bottom */}
+      <div className="border-t border-border p-4 flex-shrink-0 bg-background">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
           <div className="flex gap-2">
             <div className="flex-1 relative">
@@ -197,6 +199,9 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
           </p>
         </form>
       </div>
+
+      {/* Error Toast Notification */}
+      {error && <ErrorToast message={error} onClose={() => setError(null)} />}
     </div>
   )
 }

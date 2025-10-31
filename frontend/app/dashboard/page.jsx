@@ -1,6 +1,6 @@
 "use client"
 
-import { useState,useEffect} from "react"
+import { useState } from "react"
 import { useAuth } from "@/hooks/use-auth"
 import { useWorkflows } from "@/hooks/use-workflows"
 import { N8nKeySetup } from "@/components/n8n-key-setup"
@@ -12,16 +12,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Workflow, MessageSquare, Sparkles, Plus } from "lucide-react"
 
 export default function DashboardPage() {
-  const { user, profile, loading,session } = useAuth()
-  const {workflows,create_session} = useWorkflows()
+  const { user, profile, loading, session } = useAuth()
+  const { workflows, create_session } = useWorkflows()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSessionId, setActiveSessionId] = useState(null)
   const [activeSession, setActiveSession] = useState(null)
   const [showWorkflowSelector, setShowWorkflowSelector] = useState(false)
-
-
-  
-
 
   // Show loading state
   if (loading) {
@@ -35,7 +31,7 @@ export default function DashboardPage() {
     )
   }
 
-   //Show n8n key setup if not configured
+  //Show n8n key setup if not configured
   if (!profile?.n8n_key) {
     return <N8nKeySetup onComplete={() => window.location.reload()} />
   }
@@ -47,33 +43,29 @@ export default function DashboardPage() {
   const handleWorkflowSelect = async (selection) => {
     try {
       // If creating a new workflow, create it first
-      let payload;
+      let payload
       if (selection.type === "new") {
         payload = {
-          extra:false,
-          workflow_id:null
+          extra: false,
+          workflow_id: null,
         }
 
-        const newWorkflow = await create_session(selection.workflowName,payload)
-        let workflowId = newWorkflow.thread_id
+        const newWorkflow = await create_session(selection.workflowName, payload)
+        const workflowId = newWorkflow.thread_id
         setActiveSessionId(workflowId)
         setActiveSession(newWorkflow)
         setShowWorkflowSelector(false)
-
-      }else{
-
+      } else {
         payload = {
-          extra:true,
-          workflow_id:selection.workflowId
+          extra: true,
+          workflow_id: selection.workflowId,
         }
 
-        const workflow = await create_session(selection.workflowName,payload)
+        const workflow = await create_session(selection.workflowName, payload)
         setActiveSessionId(workflow.thread_id)
         setActiveSession(workflow)
         setShowWorkflowSelector(false)
-
       }
-      
     } catch (error) {
       console.error("Error creating session:", error)
       // Handle error - show toast or alert
@@ -87,19 +79,21 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="h-screen flex bg-background">
-      {/* Sidebar */}
-      <Sidebar
-        sessions={workflows}
-        activeSessionId={activeSessionId}
-        onSessionSelect={handleSessionSelect}
-        onNewSession={handleNewSession}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+    <div className="h-screen flex bg-background overflow-hidden">
+      {/* Sidebar - fixed height */}
+      <div className="flex-shrink-0 h-screen overflow-hidden">
+        <Sidebar
+          sessions={workflows}
+          activeSessionId={activeSessionId}
+          onSessionSelect={handleSessionSelect}
+          onNewSession={handleNewSession}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+      </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {activeSession ? (
           <ChatInterface
             sessionId={activeSession?.thread_id}
@@ -108,7 +102,7 @@ export default function DashboardPage() {
           />
         ) : (
           // Welcome screen
-          <div className="flex-1 flex items-center justify-center p-8">
+          <div className="flex-1 flex items-center justify-center p-8 overflow-auto">
             <div className="max-w-2xl text-center">
               <div className="mb-8">
                 <div className="flex justify-center mb-6">

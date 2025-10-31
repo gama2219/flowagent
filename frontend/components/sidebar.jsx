@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/hooks/use-auth"
 import { MessageSquare, Plus, Settings, LogOut, Workflow, User, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-
+import { ThemeToggle } from "./theme-toggle"
 
 export function Sidebar({
   sessions = [],
@@ -15,11 +15,7 @@ export function Sidebar({
   collapsed = false,
   onToggleCollapse,
 }) {
-  const { user,signOut,n8nprofile} = useAuth()
- 
-
-
-
+  const { user, signOut, n8nprofile } = useAuth()
 
   const handleSignOut = async () => {
     await signOut()
@@ -72,17 +68,17 @@ export function Sidebar({
               variant={activeSessionId === session.thread_id ? "secondary" : "ghost"}
               className={cn(
                 "w-full justify-start gap-2 text-left h-auto py-2 px-3",
-                activeSessionId === session. thread_id
+                activeSessionId === session.thread_id
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               )}
-              onClick={() => onSessionSelect(session. thread_id)}
+              onClick={() => onSessionSelect(session.thread_id)}
             >
               <MessageSquare className="h-4 w-4 flex-shrink-0" />
               {!collapsed && (
                 <div className="flex-1 min-w-0">
                   <div className="truncate text-sm font-medium">{session.metadata.thread_name}</div>
-                  <div className="truncate text-xs opacity-70">{session.metadata.thread_name|| "New Workflow"}</div>
+                  <div className="truncate text-xs opacity-70">{session.metadata.thread_name || "New Workflow"}</div>
                 </div>
               )}
             </Button>
@@ -97,9 +93,7 @@ export function Sidebar({
             <div className="flex items-center gap-2 px-2 py-1">
               <User className="h-4 w-4 text-sidebar-foreground" />
               <div className="flex-1 min-w-0">
-                <div className="truncate text-sm font-medium text-sidebar-foreground">
-                  {n8nprofile?.firstName}
-                </div>
+                <div className="truncate text-sm font-medium text-sidebar-foreground">{n8nprofile?.firstName}</div>
                 <div className="truncate text-xs text-sidebar-foreground/70">{user?.email}</div>
               </div>
             </div>
@@ -108,6 +102,7 @@ export function Sidebar({
           <Separator className="bg-sidebar-border" />
 
           <div className="flex gap-1">
+            <ThemeToggle />
             <Button
               variant="ghost"
               size="sm"
