@@ -1,86 +1,175 @@
--- Create profiles table to store user data and n8n API keys
-CREATE TABLE IF NOT EXISTS profiles (
-  id UUID REFERENCES auth.users(id) PRIMARY KEY,
-  email TEXT,
-  full_name TEXT,
-  n8n_api_key TEXT,
-  n8n_instance_url TEXT DEFAULT 'https://your-n8n-instance.com',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- Combined idempotent script: public.profiles, trigger, FK, RLS policies, grants
+-- Assumption: owner role for granting execute is 'postgres'. Replace if needed.
+
+--  Create table if not exists (keeps constraints consistent)
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id uuid PRIMARY KEY,
+  full_name text,
+  n8n_key text,
+  n8n_endpoint text
 );
 
--- Create workflows table to store n8n workflow information
-CREATE TABLE IF NOT EXISTS workflows (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  n8n_workflow_id TEXT NOT NULL,
-  name TEXT NOT NULL,
-  description TEXT,
-  is_active BOOLEAN DEFAULT false,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+--  Comments (optional metadata)
+COMMENT ON TABLE public.profiles IS 'User profile table (linked to auth.users)';
+COMMENT ON COLUMN public.profiles.id IS 'References auth.users.id';
+COMMENT ON COLUMN public.profiles.full_name IS 'Full name of the user';
+COMMENT ON COLUMN public.profiles.n8n_key IS 'n8n integration key (optional)';
+COMMENT ON COLUMN public.profiles.n8n_endpoint IS 'n8n integration endpoint (optional)';
+
+--  Index for common lookups
+CREATE INDEX IF NOT EXISTS idx_profiles_full_name ON public.profiles (full_name);
+
+--  Ensure FK from public.profiles.id -> auth.users.id exists (safe/no-op if present)
+DO $do$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.table_constraints tc
+    JOIN information_schema.key_column_usage kcu
+      ON tc.constraint_name = kcu.constraint_name
+     AND tc.table_schema = kcu.table_schema
+    WHERE tc.constraint_type = 'FOREIGN KEY'
+      AND tc.table_schema = 'public'
+      AND tc.table_name = 'profiles'
+      AND kcu.column_name = 'id'
+  ) THEN
+    EXECUTE '
+      ALTER TABLE public.profiles
+      ADD CONSTRAINT profiles_id_fkey
+      FOREIGN KEY (id)
+      REFERENCES auth.users(id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
+    ';
+  END IF;
+EXCEPTION WHEN others THEN
+  RAISE NOTICE 'Skipping FK creation for public.profiles(id) -> auth.users(id): %', SQLERRM;
+END;
+$do$ LANGUAGE plpgsql;
+
+--  Enable Row Level Security
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+--  Create (or replace) SECURITY DEFINER trigger function to create profile on auth.users insert
+CREATE OR REPLACE FUNCTION public.handle_new_user_create_profile()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  -- If no user id, nothing to do
+  IF NEW.id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Insert profile only if not present
+  INSERT INTO public.profiles (id, full_name)
+  SELECT NEW.id,
+         COALESCE(
+           NULLIF(NEW.raw_user_meta_data ->> 'full_name', ''),
+           NULLIF(NEW.raw_user_meta_data ->> 'name', ''),
+           NULLIF(NEW.email, '')
+         )
+  WHERE NOT EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = NEW.id);
+
+  RETURN NEW;
+END;
+$$;
+
+--  Revoke broad execute and grant to owner role (adjust owner role if needed)
+REVOKE EXECUTE ON FUNCTION public.handle_new_user_create_profile() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user_create_profile() FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.handle_new_user_create_profile() TO postgres;
+
+--  Create the trigger on auth.users to call the function AFTER INSERT (ensure idempotent)
+DROP TRIGGER IF EXISTS create_profile_after_user_insert ON auth.users;
+CREATE TRIGGER create_profile_after_user_insert
+AFTER INSERT ON auth.users
+FOR EACH ROW
+EXECUTE FUNCTION public.handle_new_user_create_profile();
+
+--  Helper to create policy if not exists (SECURITY DEFINER)
+CREATE OR REPLACE FUNCTION public.create_policy_if_not_exists(
+  p_schemaname text,
+  p_tablename text,
+  p_policyname text,
+  p_definition text
+) RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = p_schemaname
+      AND tablename = p_tablename
+      AND policyname = p_policyname
+  ) THEN
+    EXECUTE p_definition;
+  END IF;
+END;
+$$;
+
+--  CREATE SELECT policy if missing
+SELECT public.create_policy_if_not_exists(
+  'public',
+  'profiles',
+  'profiles_select_own',
+  $policy$
+    CREATE POLICY profiles_select_own
+    ON public.profiles
+    FOR SELECT
+    TO authenticated
+    USING (id = (SELECT auth.uid()));
+  $policy$
 );
 
--- Create chat_sessions table to handle multiple sessions per workflow
-CREATE TABLE IF NOT EXISTS chat_sessions (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  workflow_id UUID REFERENCES workflows(id) ON DELETE CASCADE,
-  session_name TEXT NOT NULL,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+--  CREATE INSERT policy if missing
+SELECT public.create_policy_if_not_exists(
+  'public',
+  'profiles',
+  'profiles_insert_own',
+  $policy$
+    CREATE POLICY profiles_insert_own
+    ON public.profiles
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (id = (SELECT auth.uid()));
+  $policy$
 );
 
--- Create messages table to store chat messages
-CREATE TABLE IF NOT EXISTS messages (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  session_id UUID REFERENCES chat_sessions(id) ON DELETE CASCADE,
-  role TEXT NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
-  content TEXT NOT NULL,
-  metadata JSONB DEFAULT '{}',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- 12) CREATE UPDATE policy if missing
+SELECT public.create_policy_if_not_exists(
+  'public',
+  'profiles',
+  'profiles_update_own',
+  $policy$
+    CREATE POLICY profiles_update_own
+    ON public.profiles
+    FOR UPDATE
+    TO authenticated
+    USING (id = (SELECT auth.uid()))
+    WITH CHECK (id = (SELECT auth.uid()));
+  $policy$
 );
 
--- Enable Row Level Security
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE workflows ENABLE ROW LEVEL SECURITY;
-ALTER TABLE chat_sessions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-
--- Create RLS policies
-CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
-
-CREATE POLICY "Users can view own workflows" ON workflows FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own workflows" ON workflows FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own workflows" ON workflows FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own workflows" ON workflows FOR DELETE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can view own chat sessions" ON chat_sessions FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own chat sessions" ON chat_sessions FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own chat sessions" ON chat_sessions FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own chat sessions" ON chat_sessions FOR DELETE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can view messages from own sessions" ON messages FOR SELECT USING (
-  EXISTS (
-    SELECT 1 FROM chat_sessions 
-    WHERE chat_sessions.id = messages.session_id 
-    AND chat_sessions.user_id = auth.uid()
-  )
-);
-CREATE POLICY "Users can insert messages to own sessions" ON messages FOR INSERT WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM chat_sessions 
-    WHERE chat_sessions.id = messages.session_id 
-    AND chat_sessions.user_id = auth.uid()
-  )
+-- 13) CREATE DELETE policy if missing
+SELECT public.create_policy_if_not_exists(
+  'public',
+  'profiles',
+  'profiles_delete_own',
+  $policy$
+    CREATE POLICY profiles_delete_own
+    ON public.profiles
+    FOR DELETE
+    TO authenticated
+    USING (id = (SELECT auth.uid()));
+  $policy$
 );
 
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_workflows_user_id ON workflows(user_id);
-CREATE INDEX IF NOT EXISTS idx_chat_sessions_user_id ON chat_sessions(user_id);
-CREATE INDEX IF NOT EXISTS idx_chat_sessions_workflow_id ON chat_sessions(workflow_id);
-CREATE INDEX IF NOT EXISTS idx_messages_session_id ON messages(session_id);
-CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at);
+--  Cleanup helper function
+DROP FUNCTION IF EXISTS public.create_policy_if_not_exists(text, text, text, text);
+
+--  Grants: authenticated users allowed; keep anon out unless explicitly desired
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+-- If you want anonymous users to have access, uncomment the following line:
+-- GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO anon;
+
+-- End of consolidated script
