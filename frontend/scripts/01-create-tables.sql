@@ -172,4 +172,4 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
 -- If you want anonymous users to have access, uncomment the following line:
 -- GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO anon;
 
--- End of consolidated script
+-- End
