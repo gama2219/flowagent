@@ -3,11 +3,14 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 from tqdm import tqdm
 from time import sleep
+from dotenv import dotenv_values
 import json
 import os
 
+configurations:dict = dotenv_values()
 
-google_api_key='AIzaSyCiqPhMA-zpr03dUtW122r83cT0IaiDCHE'
+
+google_api_key=configurations.get('google_api_key')
 
 
 def metadata_func(record: dict, metadata: dict) -> dict:
