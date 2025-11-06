@@ -1,3 +1,5 @@
+#this script is supposed to embedd and store json docs in the chroma_db
+
 from langchain_community.document_loaders import JSONLoader
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
@@ -8,7 +10,6 @@ import json
 import os
 
 configurations:dict = dotenv_values()
-
 
 google_api_key=configurations.get('google_api_key')
 
