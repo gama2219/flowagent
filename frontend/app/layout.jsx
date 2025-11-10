@@ -14,17 +14,11 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }) {
-  const supabase = await createClient()
-  const { data: claims_, error } = await supabase.auth.getClaims()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const response = await supabase.from("profiles").select("*").eq("id", claims_?.claims?.sub).single()
 
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <AuthProvider account_profile={response} session_={session} user_={claims_?.claims}>
+        <AuthProvider >
           <NetworkErrorAlert />
           <Suspense>{children}</Suspense>
         </AuthProvider>
