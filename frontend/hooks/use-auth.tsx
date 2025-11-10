@@ -2,19 +2,32 @@
 
 import { useState, useEffect, createContext, useContext } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { serverSignOut, serverFetchProfile, serverUpdateProfile } from "@/lib/supabase/auth-actions"
+import { serverSignOut, serverFetchProfile, serverUpdateProfile,fetchactivesession } from "@/lib/supabase/auth-actions"
 
 const AuthContext = createContext({})
 
-export function AuthProvider({ children, account_profile, session_, user_ }) {
-  const [user, setUser] = useState(user_)
+export function AuthProvider({ children}) {
+  const [user, setUser] = useState()
   const [n8nprofile, setN8nprofile] = useState()
-  const [profile, setProfile] = useState(account_profile?.data)
+  const [profile, setProfile] = useState()
   const [loading, setLoading] = useState(true)
-  const [session, setSession] = useState(session_)
+  const [session, setSession] = useState()
   const supabase = createClient()
 
   useEffect(() => {
+    const initialize_user = async()=>{
+      const sess = await fetchactivesession()
+      setSession(sess)
+      if (sess?.user){
+        setUser(sess?.user)
+      }
+      //finally set profile
+      fetchProfile(user?.id)
+
+    }
+
+    initialize_user()
+
     const get_user_n8n = async () => {
       try {
         const response = await fetch("/api/n8n/get-user", {
@@ -43,6 +56,7 @@ export function AuthProvider({ children, account_profile, session_, user_ }) {
         }
       }
     })
+   //const sess= await fetchactivesession()
 
     setLoading(false)
 
