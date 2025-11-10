@@ -83,7 +83,8 @@ export function AuthProvider({ children, account_profile, session_, user_ }) {
   const updateProfile = async (updates) => {
     if (!user) return { error: "No user logged in", data: null }
 
-    const result = await serverUpdateProfile(user.id, updates)
+    const result = await serverUpdateProfile(user.id || user?.sub, updates)
+    console.log(result)
     if (!result.error && result.data) {
       setProfile(result.data)
     }
