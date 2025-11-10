@@ -94,3 +94,19 @@ export async function serverSignUp(email: string, password: string, fullName: st
     return { error: error instanceof Error ? error.message : "Sign up failed", data: null }
   }
 }
+
+export async function fetchactivesession(){
+  try{
+    const supabase = await createClient()
+    const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  return session
+
+  }catch(err){
+    return  {error:err}
+
+  }
+
+
+}
