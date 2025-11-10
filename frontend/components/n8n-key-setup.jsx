@@ -67,8 +67,8 @@ export function N8nKeySetup({ onComplete }) {
     setError("")
 
     const { error } = await updateProfile({
-      n8n_api_key: apiKey,
-      n8n_instance_url: instanceUrl,
+      n8n_key: apiKey,
+      n8n_endpoint: instanceUrl,
     })
 
     if (error) {
