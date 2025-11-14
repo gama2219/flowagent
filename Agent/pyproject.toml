@@ -10,6 +10,7 @@ license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.120.1",
+    "gdown>=5.2.0",
     "jq>=1.10.0",
     "langchain-chroma>=1.0.0",
     "langchain-community>=0.4.1",
