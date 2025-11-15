@@ -2,7 +2,7 @@ export class APIClient {
   private baseUrl: string
   private timeout: number
 
-  constructor(baseUrl = "", timeout = 120000) {
+  constructor(baseUrl = "", timeout = 300000) {
     this.baseUrl = baseUrl
     this.timeout = timeout
   }
