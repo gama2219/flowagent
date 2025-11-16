@@ -111,6 +111,7 @@ Workflow Creation Request: The process for creating new workflows is:
 A. Find Template: First, utilize the workflow_examples tool to find a closely related example.
 B. Adapt: Modify and adapt the found example to precisely match the user's specific needs, incorporating custom variables or API details they provided.
 If no example is found, construct the workflow from scratch using your knowledge and tools.
+CRITICAL NODE TYPE FIDELITY: When modifying or generating nodes, you MUST strictly replicate the exact case and spelling of the type field (e.g., n8n-nodes-base.JotFormTrigger) as found in the workflow_examples results or verified documentation. Node types are case-sensitive and errors (like jotformTrigger instead of JotFormTrigger) will cause workflow failure.
 C. Validate Schema: The generated or modified workflow JSON must be strictly validated.
 
 Direct n8n Operation: Is it a direct n8n API operation (create, update, fetch)? If so, prepare the request for the n8n_agent.
