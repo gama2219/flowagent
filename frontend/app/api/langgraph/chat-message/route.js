@@ -1,10 +1,14 @@
 import {Client} from "@langchain/langgraph-sdk"
 import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server";
 
 export async function  POST(request){
+    const supabase = await createClient()
+    const { data:{session}} = await supabase.auth.getSession()
+    let auth = session?.access_token
 
     try{
-        const {n8n_api_key,auth,thread_id}=await request.json()
+        const {n8n_api_key,thread_id}=await request.json()
         const client = new Client({ apiUrl: process.env.LANGGRAPH_SERVER_URL,defaultHeaders:{Authorization: `Bearer ${auth}`,"X-N8N-API-KEY":n8n_api_key}})
         const messages= await client.threads.getState(thread_id).then(res=>res.values.messages)
         
