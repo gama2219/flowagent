@@ -1,12 +1,16 @@
 import {Client} from "@langchain/langgraph-sdk"
 import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request){
+    const supabase = await createClient()
+    const { data:{session}} = await supabase.auth.getSession()
+    let auth = session?.access_token
     //meant to create session
     let _payload;
 
     try{
-    const {n8n_api_key,session_name,payload,auth}= await request.json()
+    const {n8n_api_key,session_name,payload}= await request.json()
 
     if (!payload.extra){
         _payload ={metadata:{thread_name:session_name}}
