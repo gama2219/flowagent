@@ -1,9 +1,8 @@
 import { APIClient } from "@/lib/api/client"
 
 export class WorkflowService {
-  constructor(n8n_api_key, auth) {
+  constructor(n8n_api_key) {
     this.n8n_api_key = n8n_api_key
-    this.auth = auth
     this.client = new APIClient()
   }
 
@@ -11,7 +10,6 @@ export class WorkflowService {
     try {
       const res = await this.client.post("/api/langgraph/fetch-sessions", {
         n8n_api_key: this.n8n_api_key,
-        auth: this.auth,
       })
       return res?.sessions || []
     } catch (error) {
@@ -26,7 +24,6 @@ export class WorkflowService {
         n8n_api_key: this.n8n_api_key,
         session_name: session_name,
         payload: payload,
-        auth: this.auth,
       })
     } catch (error) {
       console.error("Error creating workflow:", error)
@@ -39,7 +36,6 @@ export class WorkflowService {
       const res = await this.client.post("/api/langgraph/fetch-session", {
         n8n_api_key: this.n8n_api_key,
         session_name: session_name,
-        auth: this.auth,
       })
       return res?.session
     } catch (error) {
@@ -52,7 +48,6 @@ export class WorkflowService {
     try {
       const res = await this.client.post("/api/langgraph/chat-message", {
         n8n_api_key: this.n8n_api_key,
-        auth: this.auth,
         thread_id: thread_id,
       })
       return res?.messages || []
@@ -66,7 +61,6 @@ export class WorkflowService {
     try {
       const res = await this.client.post("/api/langgraph/chat", {
         n8n_api_key: this.n8n_api_key,
-        auth: this.auth,
         message: message,
         thread_id: thread_id,
       })
