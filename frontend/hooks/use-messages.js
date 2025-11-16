@@ -10,7 +10,7 @@ export function useMessages(sessionId) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const { user,profile,session} = useAuth()
-  const workflowService = new WorkflowService(profile?.n8n_key,session?.access_token)
+  const workflowService = new WorkflowService(profile?.n8n_key)
 
   useEffect(() => {
     if (sessionId) {
