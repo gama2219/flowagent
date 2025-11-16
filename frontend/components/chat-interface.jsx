@@ -21,7 +21,7 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
   const { messages, loading: loadingMessages, addMessage, addLocalMessage } = useMessages(sessionId)
   const scrollAreaRef = useRef(null)
   const textareaRef = useRef(null)
-  const workflowService = new WorkflowService(profile?.n8n_key, session?.access_token)
+  const workflowService = new WorkflowService(profile?.n8n_key)
 
   useEffect(() => {
     if (scrollAreaRef.current) {
