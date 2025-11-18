@@ -1,0 +1,928 @@
+{
+  "name": "Conversational AI Chatbot with Google Gemini for Text & Image  Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3ce66e0-2b6f-4714-a672-59ef6e43ced9",
+              "name": "prompt",
+              "type": "string",
+              "value": "=1. Rules\n- Communicate formally, clearly, and respectfully at all times.\n- Be concise and precise, avoiding unnecessary details.\n- Maintain a positive, professional tone as a reliable and knowledgeable assistant.\n- Respect user boundaries and refrain from engaging in prohibited or inappropriate topics.\n- Keep the conversation engaging by encouraging user participation, but when requesting clarification or additional information, ask only one focused question at a time to avoid overwhelming the user. Avoid abrupt endings to the dialogue.\n- Follow user instructions precisely.\n- Do not include any additional text or explanations unless explicitly requested.\n\n2. Response instructions\n- Analyze the message and conversation history to maintain context and continuity.\n- If repetition is requested, return the message exactly as provided. Otherwise, respond clearly and appropriately based on intent and context.\n- If the message is vague, suggest an interpretation and ask for clarification while keeping the conversation active."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5a697688-ce88-43d2-9b34-defa98b50f0b",
+      "name": "chatPrompt",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1232,
+        368
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d78c64d5-3c9e-4ffd-875e-973eb3c4d20a",
+              "name": "prompt",
+              "type": "string",
+              "value": "=1. Rules\n- Communicate formally, clearly, and respectfully at all times.\n- Be concise and precise, avoiding unnecessary details.\n- Maintain a positive, professional tone as a reliable and knowledgeable assistant.\n- Respect user boundaries and refrain from engaging in prohibited or inappropriate topics.\n- Keep the conversation engaging by encouraging user participation, but when requesting clarification or additional information, ask only one focused question at a time to avoid overwhelming the user. Avoid abrupt endings to the dialogue.\n- Follow user instructions precisely.\n- Do not include any additional text or explanations unless explicitly requested.\n\n2. General Instructions\n- If a message is unclear or lacks details, respond with your best understanding as a suggestion, and politely ask the user to confirm or provide more details if it is not what they meant.\n- If the request is inappropriate or irrelevant, respond politely and clearly refuse, maintaining respect and professionalism, and invite a valid request.\n- Always follow the established rules to maintain professionalism and accuracy."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3dd4a5da-4449-4010-892d-16d8c655d335",
+      "name": "otherPrompt",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1232,
+        528
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "70c93816-7110-48e3-a105-568dd766bdf4",
+              "name": "prompt",
+              "type": "string",
+              "value": "=1.  General instructions\nCreate a prompt that generates only one response with no comments and no line breaks. Based on the input provided, generate a detailed visual description of the request in a clear and coherent manner. Avoid using quotation marks, apostrophes, or any other punctuation marks.\n\n2. Visual specifications\n- Composition: maintain a balanced and harmonious layout where all elements (images, shapes, and text) work together seamlessly. Ensure that no part of the image feels overcrowded, and the design directs the viewer’s attention naturally. Use a minimalistic approach, avoiding excessive detail or distractions.\n\n- Color palette: choose a color scheme that complements the overall theme and enhances the mood. The colors should be visually pleasing and work together harmoniously. Use no more than 3-4 main colors to maintain simplicity and coherence, ensuring they do not overpower the design.\n\n- Visual clarity: the image should be crisp and clear, with all elements legible and easy to interpret. Avoid blurry or pixelated visuals. Maintain sharp contrasts between key elements for emphasis and visual clarity.\n\n- Image size and resolution: the image should be sized to fit standard display requirements (e.g., social media, web posts). Ensure the resolution is high enough for clarity on both desktop and mobile devices. The image must maintain visual quality without losing sharpness or details when viewed on different screens.\n\n- Aesthetic appeal: aim for a design that is not only functional but also visually appealing. The overall style should be modern, clean, and aesthetically pleasing, with a consistent look that aligns with the intended mood or message. Ensure the design is pleasing to the eye, evoking the intended response from the viewer.\n\n- Visual balance: ensure the elements in the image are well-spaced, with no part feeling too heavy or too light. Create a natural flow of focus, guiding the viewer’s eye through the composition without distraction."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2b5b29b-2b40-4fa2-a89e-e5c26d770ab5",
+      "name": "generatePrompt",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1232,
+        208
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f435e1c3-6ff9-4e68-852c-0a39a5903ebe",
+              "name": "prompt",
+              "type": "string",
+              "value": "={{ $json.prompt }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "aef3b766-4f56-44aa-a263-0e183fab46ea",
+      "name": "buildPrompt",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1360,
+        368
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Input from user: {{ $('sessionData').item.json.Mensaje }}\n\n{{ $json.prompt }}\n\nRespond only with the exact text requested, strictly following the instructions above. ",
+        "options": {
+          "systemMessage": "=You are a professional enterprise chatbot designed to assist users with clear, respectful, and accurate communication. You provide informative text responses and generate images only upon explicit user requests. Utilize available conversation history to maintain context and coherence. Adhere strictly to company rules to ensure appropriate and secure interactions.\n\n\n\nYou can chat with me to get answers and create custom images based on your instructions.\n\n\n\nPrioritize the most recent relevant message if multiple prior references exist. Always respond in english when providing text-based chat replies. For image generation requests, respond in English. Keep responses as short as possible without compromising clarity or natural interaction. Do not force interaction with the user beyond what is necessary to respond clearly."
+        }
+      },
+      "id": "3b9b5a86-f946-4cce-acef-955a4b518c83",
+      "name": "ChatCore",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1504,
+        368
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {}
+      },
+      "id": "b2fd0c8d-990d-422e-973c-47fe60dad357",
+      "name": "GeminiModel",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1520,
+        528
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "40BlpNQ0np5cvwsa",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=1. Context\nYou are an intelligent assistant designed to analyze user requests accurately by considering both the current user input and prior conversation history (if available). Use this context to improve classification and response relevance. Only classify as \"generate\" if the request clearly meets all criteria. Never assume without certainty.\n\n2. General instructions\n- Use prior conversation history, if available, to interpret references, refinements, or corrections in the user’s message. \n- Apply updates directly when a previous request is being modified (e.g., changing part of a generated image).\n- Maintain context continuity unless the user explicitly shifts the topic.\n- When evaluating intention, prioritize the most recent relevant message to avoid using outdated context.\n- If the message is vague, nonsensical, or overly brief (e.g., a single word), do not classify it as \"generate\". Even if image requests occurred earlier. Only proceed if the current input clearly meets all criteria. Default to \"other\" unless the message includes clear direction.\n\n3. User Request: \"{{ $('sessionData').item.json.Mensaje }}\"\n\n4. Conversation history:\n{{ $json.messages}}\n\n5. Intentions\nClassify the user's intention as exactly one of the following:\n- \"generate\": user requests the direct creation of new visual content (e.g., images or art) to be delivered. This includes implicit requests for physical or tangible objects (e.g., \"give me a pet\"), but only if the message contains clear intent or is supported by prior context. Single-word or vague inputs without clear directive or context should not be treated as generate.\n- \"chat\": user engages in meaningful conversational interaction, including requests to generate textual prompts, explanations, or dialogue that have clear context and intent.\n- \"other\": request does not fit into the above categories, or involves content that is restricted, inappropriate, irrelevant, nonsensical, or lacks clear context or intent distinct from conversational engagement.\n\n6. Data types\nWhen analyzing the user’s message, determine whether a request for a physical or tangible object should be interpreted as a visual content request. In general, treat requests for tangible items as image generation unless the context explicitly suggests otherwise. For intangible content, respond with text unless the user clearly asks for an image.\n\nBased on the intention and content of the request, select exactly one data type to return:\n\n- \"text\": a textual response such as an answer, explanation, dialogue, or prompt text.\n- \"image\": a visual response explicitly or implicitly requested as image generation.\n\nAssign \"image\" as typeData only if the intention is \"generate\". In all other cases, including when the intention is \"other\", assign \"text\".\n\n7. Output format\nRespond only with a JSON object in this exact format, with no additional text or explanation: {\"intention\": \"value\", \"typeData\": \"value\"}",
+        "hasOutputParser": true
+      },
+      "id": "f5bf4b13-c62a-4580-be31-821700710a29",
+      "name": "inputProcessor",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        768,
+        352
+      ],
+      "typeVersion": 1.6,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "id": "6218d495-23c6-4fe5-9fa4-0b1bae73aea1",
+      "name": "GeminiModel1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        800,
+        512
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "40BlpNQ0np5cvwsa",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"typeData\": \"text\",\n\t\"intention\": \"generate\"\n}"
+      },
+      "id": "2d3dd2e7-029e-4a5d-915b-0c116ea8ada0",
+      "name": "structuredOutput",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        928,
+        512
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "24ab5811-2b6d-4f2f-8620-8697dadc2d4d",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "leftValue": "={{ $('intentHandler').item.json.output.typeData }}",
+                    "rightValue": "image"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "=Imagen"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "28759436-2f6a-4bb3-a9bf-924477241809",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "leftValue": "={{ $('intentHandler').item.json.output.typeData }}",
+                    "rightValue": "text"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "28708d45-21fb-4e8f-9c92-f63fa3cde894",
+      "name": "contentType",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        1808,
+        448
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "jsCode": "let texto = $input.first().json.prompt.replace(/[\\n\\r\\t]/g, \" \")  // Reemplaza saltos de línea, retorno de carro y tabulaciones por espacio\n  .replace(/['\"\\\\]/g, \"\")      // Elimina comillas simples, dobles y barras invertidas\n  .replace(/\\s+/g, \" \")        // Reemplaza múltiples espacios por un solo espacio\n  .trim();                     // Elimina los espacios en blanco al inicio y al final\n\nreturn {\n  text: texto\n}"
+      },
+      "id": "4083ce40-ce36-4348-82ab-fefe6c0eac7a",
+      "name": "textCleaner",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2048,
+        272
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"text\": \"{{ $json.text }}\"\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"responseModalities\": [\"Text\", \"Image\"]\n  }\n}",
+        "options": {}
+      },
+      "id": "8d8da7f6-c119-48ed-8af6-d6edc0ecac30",
+      "name": "imageGeneration",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2160,
+        272
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "40BlpNQ0np5cvwsa",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "candidates[0].content.parts[1].inlineData.data",
+        "options": {
+          "fileName": "generated_image.png"
+        }
+      },
+      "id": "1a7b73f4-9f42-4f99-a545-23c3ee1a7a6f",
+      "name": "imageBuilder",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        2288,
+        272
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('sessionData').item.json.sessionId }}",
+        "binaryData": true,
+        "additionalFields": {
+          "fileName": "=generated_image.png"
+        }
+      },
+      "id": "b70fedc0-a2cc-449a-b098-d8690784f702",
+      "name": "sendImage",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2400,
+        272
+      ],
+      "webhookId": "511272cc-d9e3-4384-9407-e5d4296db621",
+      "typeVersion": 1,
+      "credentials": {
+        "telegramApi": {
+          "id": "lRPGqcel4BTX2Jw0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('sessionData').item.json.sessionId }}",
+        "text": "={{ $('ChatCore').item.json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "3ae663ec-17bb-4ffe-8046-b68fabc4c705",
+      "name": "sendTextMessage",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2400,
+        448
+      ],
+      "webhookId": "1d1eee00-2306-4ac1-870f-0988e305f0d0",
+      "typeVersion": 1,
+      "credentials": {
+        "telegramApi": {
+          "id": "lRPGqcel4BTX2Jw0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "Mensaje",
+              "value": "={{ $('userInput').item.json.message.text }}"
+            },
+            {
+              "name": "sessionId",
+              "value": "={{ $('userInput').item.json.message.chat.id }}"
+            },
+            {
+              "name": "Lenguaje",
+              "value": "={{ $('userInput').item.json.message.from.language_code }}"
+            },
+            {
+              "name": "Username",
+              "value": "={{ $('userInput').item.json.message.chat.username }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9e2163c7-06c9-4a4a-9d75-7598c610bafe",
+      "name": "sessionData",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        240,
+        368
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "options": {
+          "groupMessages": true
+        }
+      },
+      "id": "e2232979-1b55-4a41-847b-ab12deda3794",
+      "name": "conversationStore",
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "position": [
+        368,
+        368
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('sessionData').item.json.sessionId }}",
+        "contextWindowLength": 2
+      },
+      "id": "214f0b89-099b-46e1-904f-df8317d79cc4",
+      "name": "memoryRetriever",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        400,
+        512
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\nconst lastItem = allItems[allItems.length - 1];\n\nif (lastItem && Array.isArray(lastItem.json.messages)) {\n  const messages = lastItem.json.messages;\n  const count = messages.length;\n\n  if (count === 0) return [{ json: { message: \"\" } }];\n\n  const extractFirstLine = (text) => {\n    if (!text) return \"\";\n    return text.split('\\n')[0].replace(/^Input from user:\\s*/, '');\n  };\n\n  const trimEndNewline = (text) => {\n    if (!text) return \"\";\n    return text.replace(/\\n+$/, '');\n  };\n\n  // Tomar los últimos dos o menos mensajes\n  const selectedMessages = (count === 1) ? [messages[0]] : messages.slice(-1);\n\n  // Construir el texto concatenado\n  const combinedMessage = selectedMessages.map((msg, idx) => {\n    return `Message ${idx + 1}:\\nhuman: ${extractFirstLine(msg.human)}\\nai: ${trimEndNewline(msg.ai)}`;\n  }).join('\\n\\n');\n\n  return [{ json: { messages: combinedMessage } }];\n}\n\nreturn [{ json: { messages: \"\" } }];"
+      },
+      "id": "e7fb7010-012a-460f-874e-0cdaf49f0dd6",
+      "name": "latestContext",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        640,
+        368
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "24ab5811-2b6d-4f2f-8620-8697dadc2d4d",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "leftValue": "={{ $json.output.intention }}",
+                    "rightValue": "generate"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "generate"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "28759436-2f6a-4bb3-a9bf-924477241809",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "leftValue": "={{ $json.output.intention }}",
+                    "rightValue": "chat"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "chat"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "de4b6e87-950e-461c-869f-d27c73f8d763",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "leftValue": "={{ $json.output.intention }}",
+                    "rightValue": "other"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2d919f37-e2a1-4a44-bedf-f2283da52906",
+      "name": "intentHandler",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        1040,
+        368
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "3357c10d-bd31-46e3-9b19-46770ae56625",
+      "name": "userInput",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        128,
+        368
+      ],
+      "webhookId": "ddbf3f08-3f4d-446d-9378-054225c91a06",
+      "typeVersion": 1,
+      "credentials": {
+        "telegramApi": {
+          "id": "lRPGqcel4BTX2Jw0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('sessionData').item.json.sessionId }}",
+        "contextWindowLength": 10
+      },
+      "id": "356a29a7-c06f-46f5-8e3d-8c8949f59838",
+      "name": "conversationMemory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1648,
+        544
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d11831d7-533b-4132-9849-612e093d6b32",
+              "name": "prompt",
+              "type": "string",
+              "value": "={{ $('ChatCore').item.json.output }} It is mandatory to add a description of the image you are going to make."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f253a56b-65a3-449d-aa04-57c282fc0483",
+      "name": "errorPreprocessor",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1920,
+        272
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "### 2. Memory and Conversational Context\n\nRetrieves the necessary context to properly infer intentions.\n\n- conversationStore: stores the entire conversation history.\n\n- memoryRetriever: extracts relevant information according to the current need.\n\n- latestContext: formats and prepares the context to be useful in response generation.\n",
+        "height": 680,
+        "width": 380,
+        "color": 4
+      },
+      "id": "485bdd47-a57c-4eda-9b78-7546dd7008be",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### 1. Input and Session Management\n\nReceives messages from Telegram and manages the session to maintain context.\n\n- userInput: captures the user's message.\n\n- sessionData: saves and updates the session state.\n",
+        "height": 680,
+        "width": 340,
+        "color": 5
+      },
+      "id": "eb32f8dc-c09a-49ff-a2f9-f0783e56de24",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### 3. Intent Processing and Prompt Generation\nAnalyzes the intention and selects appropriate prompts according to the user's intention.\n\n- inputProcessor: detects intention and type of content to send.\n\n- intentHandler: redirects the flow based on the intention.\n\n- generatePrompt, chatPrompt, otherPrompt, buildPrompt: select the prompts for the response.",
+        "height": 680,
+        "width": 700,
+        "color": 6
+      },
+      "id": "755bb4e8-5bf9-4967-9657-0a4468ebefe5",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        768,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### 4. Core of Generation and Conversation Management\nGenerates responses using Google Gemini, integrating context for coherence.\n\n- ChatCore: orchestrates the generation and management of the conversation.\n\n- GeminiModel: creates the final response based on prompts.\n\n- conversationMemory: stores information to maintain coherence.",
+        "height": 680,
+        "width": 300,
+        "color": 3
+      },
+      "id": "95164d3e-4ef8-4090-b970-2e705ec4f2e0",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1488,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### 5. Content Classification and User Delivery\n\nDetermines the type of content and manages its delivery via Telegram.\n\n- contentType: defines the output format (text, image, etc.).\n\n- errorPreprocessor, textCleaner: clean and validate the content.\n\n- imageGeneration, imageBuilder: create visual content when necessary.\n\n- sendImage, sendTextMessage: send the content to the user.",
+        "height": 680,
+        "width": 800,
+        "color": 7
+      },
+      "id": "99026c72-bbc1-42d5-b56a-45720c0ecd6c",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1808,
+        0
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "ChatCore": {
+      "main": [
+        [
+          {
+            "node": "contentType",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "userInput": {
+      "main": [
+        [
+          {
+            "node": "sessionData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatPrompt": {
+      "main": [
+        [
+          {
+            "node": "buildPrompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GeminiModel": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ChatCore",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buildPrompt": {
+      "main": [
+        [
+          {
+            "node": "ChatCore",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contentType": {
+      "main": [
+        [
+          {
+            "node": "errorPreprocessor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "sendTextMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "otherPrompt": {
+      "main": [
+        [
+          {
+            "node": "buildPrompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sessionData": {
+      "main": [
+        [
+          {
+            "node": "conversationStore",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "textCleaner": {
+      "main": [
+        [
+          {
+            "node": "imageGeneration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GeminiModel1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "inputProcessor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "imageBuilder": {
+      "main": [
+        [
+          {
+            "node": "sendImage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "intentHandler": {
+      "main": [
+        [
+          {
+            "node": "generatePrompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "chatPrompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "otherPrompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "latestContext": {
+      "main": [
+        [
+          {
+            "node": "inputProcessor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generatePrompt": {
+      "main": [
+        [
+          {
+            "node": "buildPrompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inputProcessor": {
+      "main": [
+        [
+          {
+            "node": "intentHandler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "imageGeneration": {
+      "main": [
+        [
+          {
+            "node": "imageBuilder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memoryRetriever": {
+      "ai_memory": [
+        [
+          {
+            "node": "conversationStore",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "structuredOutput": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "inputProcessor",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "conversationStore": {
+      "main": [
+        [
+          {
+            "node": "latestContext",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "errorPreprocessor": {
+      "main": [
+        [
+          {
+            "node": "textCleaner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "conversationMemory": {
+      "ai_memory": [
+        [
+          {
+            "node": "ChatCore",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a819512d-4d73-4027-ba80-2afa86ed0a1e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4962941a77c4da44bac1703396b7ae8536094a036af2f87ba8600ee9720e2d9e"
+  },
+  "id": "KavpitX4znFbFW13",
+  "tags": []
+}
