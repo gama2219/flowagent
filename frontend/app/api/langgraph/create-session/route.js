@@ -10,7 +10,7 @@ export async function POST(request){
     let _payload;
 
     try{
-    const {n8n_api_key,session_name,payload}= await request.json()
+    const {n8n_api_key,n8n_url,session_name,payload}= await request.json()
 
     if (!payload.extra){
         _payload ={metadata:{thread_name:session_name}}
@@ -38,7 +38,7 @@ export async function POST(request){
     }
 
 
-    const client = new Client({ apiUrl: process.env.LANGGRAPH_SERVER_URL,defaultHeaders:{Authorization: `Bearer ${auth}`,"X-N8N-API-KEY":n8n_api_key}})
+    const client = new Client({ apiUrl: process.env.LANGGRAPH_SERVER_URL,defaultHeaders:{Authorization: `Bearer ${auth}`,"X-N8N-API-KEY":n8n_api_key,"X-N8N-ENDPOINT":n8n_url,}})
     const session = await client.threads.create(_payload)
     return NextResponse.json(session)
 } catch (error){
