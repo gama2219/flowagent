@@ -8,8 +8,8 @@ export async function  POST(request){
     let auth = session?.access_token
 
     try{
-        const {n8n_api_key,thread_id}=await request.json()
-        const client = new Client({ apiUrl: process.env.LANGGRAPH_SERVER_URL,defaultHeaders:{Authorization: `Bearer ${auth}`,"X-N8N-API-KEY":n8n_api_key}})
+        const {n8n_api_key,n8n_url,thread_id}=await request.json()
+        const client = new Client({ apiUrl: process.env.LANGGRAPH_SERVER_URL,defaultHeaders:{Authorization: `Bearer ${auth}`,"X-N8N-API-KEY":n8n_api_key,"X-N8N-ENDPOINT":n8n_url,}})
         const messages= await client.threads.getState(thread_id).then(res=>res.values.messages)
         
         if (messages){
