@@ -8,10 +8,10 @@ export async function  POST(request){
     let auth = session?.access_token
 
     try{
-        const {n8n_api_key,message,thread_id}=await request.json()
+        const {n8n_api_key,n8n_url,message,thread_id}=await request.json()
         let output;
 
-        const client = new Client({ apiUrl: process.env.LANGGRAPH_SERVER_URL,defaultHeaders:{Authorization: `Bearer ${auth}`,"X-N8N-API-KEY":n8n_api_key}})
+        const client = new Client({ apiUrl: process.env.LANGGRAPH_SERVER_URL,defaultHeaders:{Authorization: `Bearer ${auth}`,"X-N8N-API-KEY":n8n_api_key,"X-N8N-ENDPOINT":n8n_url,}})
         const streamResponse = client.runs.stream(
             thread_id, // Threadless run
              "agent", // Assistant ID
