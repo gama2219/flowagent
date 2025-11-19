@@ -7,16 +7,15 @@ import json
 
 class n8n_request_handler:
 
-    def __init__(self,url:str):
-        self.url=url
+    def __init__(self):
         self.header={
              'accept': 'application/json'
         }
     
-    def createWorkflow(self,workflow:dict,n8n_id:str):
+    def createWorkflow(self,workflow:dict,n8n_id:str,url:str):
 
         
-        create_workflow_url=self.url + '/api/v1/workflows'
+        create_workflow_url=url + '/api/v1/workflows'
         header_update:dict={**self.header,
                             'X-N8N-API-KEY':n8n_id,
                             'Content-Type': 'application/json'}
@@ -25,8 +24,8 @@ class n8n_request_handler:
 
         return response
     
-    def fetchWorkflow_1(self,id:str,n8n_id:str):
-        fetch_url=self.url + '/api/v1/workflows' + f'/{id}'
+    def fetchWorkflow_1(self,id:str,n8n_id:str,url:str):
+        fetch_url=url + '/api/v1/workflows' + f'/{id}'
         header_update={
             **self.header,
             'X-N8N-API-KEY':n8n_id
@@ -36,8 +35,8 @@ class n8n_request_handler:
 
         return response
 
-    def updateWorkflow(self,id:str,workflow:dict,n8n_id:str):
-        update_url=self.url + '/api/v1/workflows' + f'/{id}'
+    def updateWorkflow(self,id:str,workflow:dict,n8n_id:str,url:str):
+        update_url=url + '/api/v1/workflows' + f'/{id}'
         header_update={
             **self.header,
             'X-N8N-API-KEY':n8n_id,
@@ -47,8 +46,8 @@ class n8n_request_handler:
 
         return response
     
-    def fetchWorkflow(self,n8n_id:str):
-        fetch_url=self.url + '/api/v1/workflows'
+    def fetchWorkflow(self,n8n_id:str,url:str):
+        fetch_url=url + '/api/v1/workflows'
         update_header={
             **self.header,
             'X-N8N-API-KEY':n8n_id

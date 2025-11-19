@@ -11,9 +11,9 @@ anon=os.getenv('supabase_anon_key')
 auth=Auth()
 supabase:Client = create_client(url,anon)
 
-async def get_user_info(jwt:str,n8n_id:str)->dict:
+async def get_user_info(jwt:str,n8n_id:str,n8n_endpoint:str)->dict:
     user_info = await asyncio.to_thread(supabase.auth.get_user, jwt)
-    response={"identity":user_info.user.id,"n8n_id":n8n_id}
+    response={"identity":user_info.user.id,"n8n_id":n8n_id,"n8n_endpoint":n8n_endpoint}
 
     return response
 
@@ -23,6 +23,7 @@ async def authenticate_request(authorization:str,headers:dict[bytes, bytes])->Au
 
     tokens:list=authorization.split(" ")
     n8n_id=headers.get(b'x-n8n-api-key')
+    n8n_endpoint=headers.get(b'x-n8n-endpoint')
 
     if len(tokens)>2:
         raise Auth.exceptions.HTTPException(
@@ -40,7 +41,7 @@ async def authenticate_request(authorization:str,headers:dict[bytes, bytes])->Au
         try:
 
             jwt_tokens=tokens[1] 
-            response=await get_user_info(jwt_tokens,n8n_id.decode())
+            response=await get_user_info(jwt_tokens,n8n_id.decode(),n8n_endpoint.decode())
 
             return response
 

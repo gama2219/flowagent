@@ -18,5 +18,7 @@
   		"default_ttl": 43200
   	}
   },
-  "image_distro": "wolfi"
+  "dockerfile_lines": [
+    "RUN python v_db.py"
+  ]
 }
