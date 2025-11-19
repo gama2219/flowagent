@@ -17,23 +17,10 @@ import json
 
 
 google_api_key=os.getenv('google_api_key')
-url =os.getenv("n8n_endpoint")
+#url =os.getenv("n8n_endpoint")
 
 
 
-
-def checkifdatabaseexists()->None:
-    existing:bool=os.path.exists('chroma_db')
-    if existing:
-        print('database exists')
-        pass
-    else:
-        database_creation('workflows')
-    
-
-
-
-#checkifdatabaseexists()
 
 
 
@@ -43,7 +30,7 @@ embeddings=GoogleGenerativeAIEmbeddings(model='models/gemini-embedding-001',goog
 
 
 
-request_handler=n8n_request_handler(url)
+request_handler=n8n_request_handler()
 
 
 class argschema (BaseModel):
@@ -53,9 +40,10 @@ class argschema (BaseModel):
 async def workflow_creator(workflow:str)->dict:
     config=get_config()
     n8n_id = config["configurable"].get("langgraph_auth_user").get('n8n_id')
+    n8n_endpoint= config["configurable"].get("langgraph_auth_user").get('n8n_endpoint')
     dict_workflow = json.loads(workflow)
 
-    response=await asyncio.to_thread(request_handler.createWorkflow,dict_workflow,n8n_id)
+    response=await asyncio.to_thread(request_handler.createWorkflow,dict_workflow,n8n_id,n8n_endpoint)
     if response.status_code==200:
         tool_response={
             'status':200,
@@ -75,7 +63,8 @@ async def workflow_creator(workflow:str)->dict:
 async def fetch_workflow(id:str)->dict:
     config=get_config()
     n8n_id = config["configurable"].get("langgraph_auth_user").get('n8n_id')
-    response=await asyncio.to_thread(request_handler.fetchWorkflow_1,id,n8n_id)
+    n8n_endpoint= config["configurable"].get("langgraph_auth_user").get('n8n_endpoint')
+    response=await asyncio.to_thread(request_handler.fetchWorkflow_1,id,n8n_id,n8n_endpoint)
 
 
     if response.status_code==200:
@@ -93,10 +82,11 @@ async def fetch_workflow(id:str)->dict:
 async def update_wokflow(workflow:str,id:str)->dict:
     config=get_config()
     n8n_id = config["configurable"].get("langgraph_auth_user").get('n8n_id')
+    n8n_endpoint= config["configurable"].get("langgraph_auth_user").get('n8n_endpoint')
 
     dict_workflow = json.loads(workflow)
 
-    response=await asyncio.to_thread(request_handler.updateWorkflow ,id,dict_workflow,n8n_id)
+    response=await asyncio.to_thread(request_handler.updateWorkflow ,id,dict_workflow,n8n_id,n8n_endpoint)
 
     if response.status_code==200:
         tool_response={
