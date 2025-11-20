@@ -41,19 +41,27 @@ async def workflow_creator(workflow:str)->dict:
     config=get_config()
     n8n_id = config["configurable"].get("langgraph_auth_user").get('n8n_id')
     n8n_endpoint= config["configurable"].get("langgraph_auth_user").get('n8n_endpoint')
-    dict_workflow = json.loads(workflow)
 
-    response=await asyncio.to_thread(request_handler.createWorkflow,dict_workflow,n8n_id,n8n_endpoint)
-    if response.status_code==200:
-        tool_response={
-            'status':200,
-            'workflow_id':response.json().get('id')
-        }
-        return tool_response
-    else:
-        tool_response={
-            'status':response.status_code,
-            'reason':response.json().get('message')
+    try:
+        dict_workflow = json.loads(workflow)
+
+        response=await asyncio.to_thread(request_handler.createWorkflow,dict_workflow,n8n_id,n8n_endpoint)
+        if response.status_code==200:
+            tool_response={
+                'status':200,
+                'workflow_id':response.json().get('id')
+            }
+            return tool_response
+        else:
+            tool_response={
+                'status':response.status_code,
+                'reason':response.json().get('message')
+            }
+            return tool_response
+    except Exception as e:
+        tool_response ={
+            'status':500,
+            'reason':e
         }
         return tool_response
     
