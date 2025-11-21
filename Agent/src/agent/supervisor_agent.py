@@ -214,9 +214,7 @@ def _prepare_tool_node(
             tool_node = ToolNode(
                 all_tools,
                 name=input_tool_node.name,
-                tags=list(input_tool_node.tags) if input_tool_node.tags else None,
-                handle_tool_errors=input_tool_node.handle_tool_errors,
-                messages_key=input_tool_node.messages_key,
+                tags=list(input_tool_node.tags) if input_tool_node.tags else None
             )
         else:
             tool_node = ToolNode(all_tools)
