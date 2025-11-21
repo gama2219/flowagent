@@ -1,4 +1,3 @@
-# ./src/agent/webapp.py
 from fastapi import FastAPI,Header,Request,HTTPException
 from contextlib import asynccontextmanager
 from src.agent.utils.dbcreation import database_creation
@@ -7,27 +6,7 @@ from typing import Annotated
 import os 
 
 
-def checkifdatabaseexists()->None:
-    existing:bool=os.path.exists('chroma_db')
-    if existing:
-        print('database exists')
-        pass
-    else:
-        database_creation('workflows')
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-
-    print ('check vectordb')
-
-    checkifdatabaseexists()
-    
-    yield  
-
-    print ('shutting down  vector db')
-
-
-app = FastAPI( )
+app = FastAPI()
 
 
 
