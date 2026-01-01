@@ -39,9 +39,6 @@ def setup_chroma_db(path:str,id:str):
         print('✓ workflow vector db successfuly created ')
         
 
-
-
-        pass
     except Exception as e:
         print(f"An error occurred during download: {e}")
 
