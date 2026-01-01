@@ -7,8 +7,10 @@ from pathlib import Path
 from v_db import setup_chroma_db
 import os 
 
+
+
 vector_path = Path('chroma_db')
-id ='1-wf5LVkvhUZgu4xKfSPcO7zhOBVRAOB6'
+id = os.getenv('workflows_drive_location')
 output_path = 'chroma_export.pkl'
 
 @asynccontextmanager
