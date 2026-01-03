@@ -14,7 +14,7 @@ rate_limiter = InMemoryRateLimiter(
 
 google_api_key= os.getenv('google_api_key')
 agent_name=os.getenv('agent_name')
-model = od.getenv('model')
+model = os.getenv('model')
 
 
 prompt_n8n_agent=prompt_template_n8n_agent.invoke({"tools": tools})
