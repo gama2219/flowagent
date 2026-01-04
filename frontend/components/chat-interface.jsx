@@ -12,6 +12,9 @@ import { Bot, Loader2, Workflow, Send, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { WorkflowService } from "@/lib/supabase/workflows"
 import { ErrorToast } from "./error-toast"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import rehypeSanitize from "rehype-sanitize"
 
 export function ChatInterface({ sessionId, sessionName, workflowName }) {
   const [input, setInput] = useState("")
@@ -137,7 +140,13 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
                   )}
                 >
                   <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                  <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeSanitize]}
+                  >
                     {Array.isArray(message.content) ? message.content[0].text : message.content}
+                  </ReactMarkdown>
+                    
                   </div>
                 </Card>
 
