@@ -42,7 +42,7 @@ export async function POST(request){
     const session = await client.threads.create(_payload)
     return NextResponse.json(session)
 } catch (error){
-    console.error(error)
+    
     return NextResponse.json(
         {
             success:false,
