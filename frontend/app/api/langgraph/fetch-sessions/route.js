@@ -16,7 +16,7 @@ export async function POST(request){
     
     return NextResponse.json({sessions:sessions})
 }catch(error){
-    console.error(error)
+    
     return NextResponse.json(
         {
         success: false,
