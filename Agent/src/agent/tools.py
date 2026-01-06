@@ -17,12 +17,6 @@ import json
 
 
 google_api_key=os.getenv('google_api_key')
-#url =os.getenv("n8n_endpoint")
-
-
-
-
-
 
 
 
