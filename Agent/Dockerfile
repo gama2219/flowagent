@@ -10,4 +10,4 @@ COPY . .
 RUN pip install -e .
 
 
-CMD ["langgraph", "dev"]
+CMD ["langgraph", "dev","--allow-blocking","--no-browser"]
