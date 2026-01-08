@@ -139,7 +139,7 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
                     message.type === "human" ? "bg-primary text-primary-foreground" : "bg-card",
                   )}
                 >
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                  <div className="text-sm leading-relaxed">
                   <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeSanitize]}

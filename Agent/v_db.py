@@ -8,9 +8,6 @@ import gdown
 
 
 
-
-
-
 def setup_chroma_db(path:str,id:str):
 
     vector_store = Chroma(
