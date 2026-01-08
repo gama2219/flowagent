@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-RUN pip install "langgraph-cli[inmem]"
+RUN pip install --no-cache-dir -U "langgraph-cli[inmem]"
 
 
 WORKDIR /app
