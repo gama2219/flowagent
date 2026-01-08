@@ -167,12 +167,6 @@ export function WorkflowSelector({ onSelect, onCancel }) {
                   className="mt-1"
                 />
               </div>
-              <Alert>
-                <Plus className="h-4 w-4" />
-                <AlertDescription>
-                  This will create a new workflow in your n8n instance and start a chat session for it.
-                </AlertDescription>
-              </Alert>
             </div>
           )}
         </CardContent>
