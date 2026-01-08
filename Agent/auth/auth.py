@@ -3,8 +3,8 @@ from supabase import create_client, Client
 import asyncio
 import os
 
-url=os.getenv('supabase_endpoint')
-anon=os.getenv('supabase_anon_key')
+url=os.getenv('NEXT_PUBLIC_SUPABASE_URL')
+anon=os.getenv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
 
 
