@@ -1,7 +1,3 @@
--- Combined idempotent script: public.profiles, trigger, FK, RLS policies, grants
--- Assumption: owner role for granting execute is 'postgres'. Replace if needed.
-
---  Create table if not exists (keeps constraints consistent)
 CREATE TABLE IF NOT EXISTS public.profiles (
   id uuid PRIMARY KEY,
   full_name text,
@@ -9,14 +5,14 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   n8n_endpoint text
 );
 
---  Comments (optional metadata)
+
 COMMENT ON TABLE public.profiles IS 'User profile table (linked to auth.users)';
 COMMENT ON COLUMN public.profiles.id IS 'References auth.users.id';
 COMMENT ON COLUMN public.profiles.full_name IS 'Full name of the user';
 COMMENT ON COLUMN public.profiles.n8n_key IS 'n8n integration key (optional)';
 COMMENT ON COLUMN public.profiles.n8n_endpoint IS 'n8n integration endpoint (optional)';
 
---  Index for common lookups
+
 CREATE INDEX IF NOT EXISTS idx_profiles_full_name ON public.profiles (full_name);
 
 --  Ensure FK from public.profiles.id -> auth.users.id exists (safe/no-op if present)
@@ -107,7 +103,6 @@ BEGIN
 END;
 $$;
 
---  CREATE SELECT policy if missing
 SELECT public.create_policy_if_not_exists(
   'public',
   'profiles',
@@ -121,7 +116,6 @@ SELECT public.create_policy_if_not_exists(
   $policy$
 );
 
---  CREATE INSERT policy if missing
 SELECT public.create_policy_if_not_exists(
   'public',
   'profiles',
@@ -135,7 +129,6 @@ SELECT public.create_policy_if_not_exists(
   $policy$
 );
 
--- 12) CREATE UPDATE policy if missing
 SELECT public.create_policy_if_not_exists(
   'public',
   'profiles',
@@ -150,7 +143,7 @@ SELECT public.create_policy_if_not_exists(
   $policy$
 );
 
--- 13) CREATE DELETE policy if missing
+
 SELECT public.create_policy_if_not_exists(
   'public',
   'profiles',
