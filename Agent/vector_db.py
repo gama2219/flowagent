@@ -103,6 +103,5 @@ def database_creation(path_:str, batch:int)->None:
     print(f"\n✓ Total: {total} documents")
     print(f"✓ Vector store count: {vector_store._collection.count()}")
 
-if __name__ == "__main__":
-                
-    database_creation('workflows',100)
+
+#database_creation('workflows',100)
