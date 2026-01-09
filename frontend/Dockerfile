@@ -12,6 +12,16 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# --- ADDED SECTION START ---
+# Declare build-time arguments (Passed from docker-compose)
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+# Set them as environment variables for the Next.js build process
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+# --- ADDED SECTION END ---
+
 # Build the Next.js application
 RUN npm run build
 
@@ -36,6 +46,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 # Set environment to production
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Ensure the keys are also available at runtime (optional but recommended)
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 # Switch to non-root user
 USER nextjs
