@@ -6,7 +6,6 @@ import json
 import os
 import gdown
 from pathlib import Path
-from vector_db import database_creation
 
 
 def setup_chroma_db(path:str,id:str):
