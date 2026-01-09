@@ -9,5 +9,7 @@ COPY . .
 
 RUN pip install -e .
 
+RUN python v_db2.py
+
 
 CMD ["langgraph", "dev","--allow-blocking","--no-browser"]

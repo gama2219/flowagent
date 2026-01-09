@@ -5,7 +5,8 @@ from dotenv import dotenv_values
 import json
 import os
 import gdown
-
+from pathlib import Path
+from vector_db import database_creation
 
 
 def setup_chroma_db(path:str,id:str):
@@ -15,6 +16,8 @@ def setup_chroma_db(path:str,id:str):
         persist_directory="./chroma_db"
     )
 
+
+    #load the collection
 
     try:
         gdown.download(output=path,id=id)
@@ -37,4 +40,18 @@ def setup_chroma_db(path:str,id:str):
     except Exception as e:
         print(f"An error occurred during download: {e}")
 
-        
+if __name__ == "__main__":
+    
+    env_variables=dotenv_values()
+
+    embedding_model=env_variables['EMBEDDING_MODEL_PAID']
+
+    id=env_variables['workflows_drive_location']
+    output_path = 'chroma_export.pkl'
+    vector_path = Path('chroma_db')
+
+
+    if embedding_model:
+        database_creation('workflows',100)
+    else:
+        setup_chroma_db(output_path,id)
