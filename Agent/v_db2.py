@@ -42,16 +42,7 @@ def setup_chroma_db(path:str,id:str):
 
 if __name__ == "__main__":
     
-    env_variables=dotenv_values()
-
-    embedding_model=env_variables['EMBEDDING_MODEL_PAID']
-
-    id=env_variables['workflows_drive_location']
+    id="1-wf5LVkvhUZgu4xKfSPcO7zhOBVRAOB6"
     output_path = 'chroma_export.pkl'
-    vector_path = Path('chroma_db')
 
-
-    if embedding_model:
-        database_creation('workflows',100)
-    else:
-        setup_chroma_db(output_path,id)
+    setup_chroma_db(output_path,id)
