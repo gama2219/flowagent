@@ -43,7 +43,7 @@ Open `.env` and fill in the following variables:
 **google_api_key** - Your Google Gemini API Key  
 **TAVILY_API_KEY** - Required for real-time node research  
 **NEXT_PUBLIC_SUPABASE_URL** - Your Supabase project URL (Local or Cloud)  
-**NEXT_PUBLIC_SUPABASE_ANON_KEY** - Your Supabase Anon/Public key 
+**NEXT_PUBLIC_SUPABASE_ANON_KEY** - Your Supabase Anon/Public key  
 **agent_name** - Default is `flowagent`  
 **LANGGRAPH_SERVER_URL** - Default is `http://127.0.0.1:2024`
 
