@@ -34,6 +34,7 @@ You will also need:
 1. Create your environment file by copying the example:
    ```bash
    cp .env.example .env
+   ```
 
 Open `.env` and fill in the following variables:
 
@@ -53,11 +54,12 @@ Build and start the application using your preferred tool:
 **Using Docker:**
 ```bash
 docker-compose up --build
-
+```
 **Using Podman :**
 
 ```bash
 podman-compose up --build
+```
 
 The application will be available at http://localhost:3000.
 
