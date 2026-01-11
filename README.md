@@ -34,3 +34,35 @@ You will also need:
 1. Create your environment file by copying the example:
    ```bash
    cp .env.example .env
+
+Open `.env` and fill in the following variables:
+
+**LANGSMITH_PROJECT** - Name of your LangSmith project for tracing  
+**LANGSMITH_API_KEY** - Your LangSmith API key for debugging  
+**google_api_key** - Your Google Gemini API Key  
+**TAVILY_API_KEY** - Required for real-time node research  
+**NEXT_PUBLIC_SUPABASE_URL** - Your Supabase project URL (Local or Cloud)  
+**NEXT_PUBLIC_SUPABASE_ANON_KEY** - Your Supabase Anon/Public key 
+**agent_name** - Default is `flowagent`  
+**LANGGRAPH_SERVER_URL** - Default is `http://127.0.0.1:2024`
+
+## 3️⃣ Launch the Agent
+
+Build and start the application using your preferred tool:
+
+**Using Docker:**
+```bash
+docker-compose up --build
+
+**Using Podman :**
+
+```bash
+podman-compose up --build
+
+The application will be available at http://localhost:3000.
+
+
+### 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request
+
