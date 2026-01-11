@@ -53,7 +53,7 @@ Build and start the application using your preferred tool:
 
 **Using Docker:**
 ```bash
-docker-compose up --build
+docker compose up
 ```
 **Using Podman :**
 
