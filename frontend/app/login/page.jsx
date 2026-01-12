@@ -98,6 +98,13 @@ export default function LoginPage() {
               Sign up
             </Link>
           </div>
+
+          <div className="mt-3 text-center text-sm">
+            <Link href="/forgot-password" className="text-primary hover:underline font-medium">
+              Forgot your password?
+            </Link>
+          </div>
+          
         </CardContent>
       </Card>
     </div>

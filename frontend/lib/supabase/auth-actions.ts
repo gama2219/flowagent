@@ -108,5 +108,46 @@ export async function fetchactivesession(){
 
   }
 
+}
+
+  
+export async function serverResetPassword(email: string) {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo:
+        process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
+        `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/reset-password`,
+    })
+
+    if (error) {
+      return { error: error.message, data: null }
+    }
+
+    return { data, error: null }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Password reset failed", data: null }
+  }
+}
+
+export async function serverUpdatePassword(password: string) {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.updateUser({
+      password: password,
+    })
+
+    if (error) {
+      return { error: error.message, data: null }
+    }
+
+    revalidatePath("/", "layout")
+    return { data, error: null }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Password update failed", data: null }
+  }
+
 
 }
+
+
