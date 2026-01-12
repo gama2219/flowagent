@@ -11,6 +11,7 @@ To run this project, you must have a container engine installed:
 - **Docker & Docker Compose**
 - **OR**
 - **Podman & Podman Compose**
+- **n8n Instance**: An accessible n8n instance with the Public API enabled.
 
 You will also need:
 
