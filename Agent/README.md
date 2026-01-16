@@ -27,3 +27,6 @@ To test the agent logic separately from the main system:
 
 ```bash
 langgraph dev --allow-blocking
+```
+
+Contribute your .json workflow files to the workflows folder.
