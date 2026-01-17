@@ -12,7 +12,7 @@ import os
 
 configurations:dict = dotenv_values()
 
-google_api_key=configurations.get('google_api_key')
+google_api_key=configurations.get('GOOGLE_API_KEY')
 
 rate_limiter = InMemoryRateLimiter(
     requests_per_second=0.2,  

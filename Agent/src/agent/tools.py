@@ -15,7 +15,7 @@ import os
 import json
 
 
-google_api_key=os.getenv('google_api_key')
+google_api_key=os.getenv('GOOGLE_API_KEY')
 
 
 

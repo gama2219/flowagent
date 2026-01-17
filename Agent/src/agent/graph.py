@@ -4,7 +4,11 @@ from src.agent.prompt import the_main_agent,prompt_template_n8n_agent
 from src.agent.supervisor_agent import create_supervisor_agent
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain.agents import create_agent
+from langchain.chat_models import init_chat_model
 import os
+
+agent_name=os.getenv('agent_name')
+model_= os.getenv('model')
 
 rate_limiter = InMemoryRateLimiter(
     requests_per_second=2/60,  
@@ -12,25 +16,16 @@ rate_limiter = InMemoryRateLimiter(
     max_bucket_size=2
 )
 
-google_api_key= os.getenv('google_api_key')
-agent_name=os.getenv('agent_name')
-model = os.getenv('model')
-
-
 prompt_n8n_agent=prompt_template_n8n_agent.invoke({"tools": tools})
 
 
-model = ChatGoogleGenerativeAI(
-    model=model,
-    temperature=1,
-    google_api_key=google_api_key,
-    rate_limiter=rate_limiter
-)
+model = init_chat_model(
+    model_,
+    temperature=1
+    )
 
 
 #agents
-
-   
 agent_n8n =create_agent(model=model,name='n8n_agent',system_prompt=prompt_n8n_agent.text,tools=tools)
 
 
