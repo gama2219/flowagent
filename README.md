@@ -43,7 +43,7 @@ You will also need:
 Open `.env` and fill in the following variables:
 
 **LANGSMITH_API_KEY** - Your LangSmith API key for debugging  
-**google_api_key** - Your Google Gemini API Key  
+**GOOGLE_API_KEY** - Your Google Gemini API Key  
 **TAVILY_API_KEY** - Required for real-time node research  
 **NEXT_PUBLIC_SUPABASE_URL** - Your Supabase project URL (Local or Cloud)  
 **NEXT_PUBLIC_SUPABASE_ANON_KEY** - Your Supabase Anon/Public key  
