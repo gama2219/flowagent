@@ -2,7 +2,7 @@
 
 Talk to your n8n workflows.
 
-Flow Agent is an AI-powered companion for n8n developers. It bridges the gap between natural language and complex automation, allowing you to create, refine, and update workflows simply by chatting.
+Flow Agent is an AI-powered companion for n8n developers.Allows you to create, refine, and update workflows simply by chatting.
 
 ![Screenshot at 2026-01-20 12-30-15](https://github.com/user-attachments/assets/63b1fa61-6cc4-41e9-b6cd-3f62dbc06801)
 
