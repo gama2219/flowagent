@@ -60,7 +60,7 @@ docker compose up
 **Using Podman :**
 
 ```bash
-podman-compose up --build
+podman-compose up 
 ```
 
 The application will be available at http://localhost:3000.
