@@ -158,7 +158,7 @@ export function WorkflowSelector({ onSelect, onCancel }) {
           {mode === "new" && (
             <div className="space-y-4">
               <div>
-                <Label htmlFor="workflowName">New Workflow Name</Label>
+                <Label htmlFor="workflowName">New Session Name</Label>
                 <Input
                   id="workflowName"
                   placeholder="Enter workflow name..."
