@@ -145,7 +145,7 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
                   rehypePlugins={[rehypeSanitize]}
                   className = "whitespace-pre-wrap break-words"
                   >
-                    {Array.isArray(message.content) ? message.content[0].text : message.content}
+                    {Array.isArray(message.content) ? message.content[0]?.text : message.content}
                   </ReactMarkdown>
                     
                   </div>
