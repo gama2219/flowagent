@@ -42,7 +42,6 @@ You will also need:
 
 Open `.env` and fill in the following variables:
 
-**LANGSMITH_PROJECT** - Name of your LangSmith project for tracing  
 **LANGSMITH_API_KEY** - Your LangSmith API key for debugging  
 **google_api_key** - Your Google Gemini API Key  
 **TAVILY_API_KEY** - Required for real-time node research  
