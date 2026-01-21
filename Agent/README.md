@@ -14,7 +14,7 @@ The agent uses a **Supervisor Architecture (via LangGraph)** :
 
 To make requests to the agent server (at localhost:2024), you must include the following headers:
 
-- **Bearer Token**: A Supabase JWT to verify the user session.
+- **Bearer Token**: A Supabase JWT to verify the user.
 - **x-n8n-api-key**: The API key for the target n8n instance.
 - **x-n8n-endpoint**: The URL of the target n8n instance.
 
