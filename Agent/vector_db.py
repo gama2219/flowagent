@@ -8,7 +8,7 @@ from time import sleep
 from dotenv import dotenv_values
 import json
 import os
-#this will work well with a paid tier
+
 
 configurations:dict = dotenv_values()
 
