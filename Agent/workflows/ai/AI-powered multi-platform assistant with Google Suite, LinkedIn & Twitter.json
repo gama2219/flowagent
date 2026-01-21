@@ -1,0 +1,1776 @@
+{
+  "name": "AI-powered multi-platform assistant with Google Suite, LinkedIn & Twitter",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "discord-pa",
+        "options": {}
+      },
+      "id": "b7bd6f8a-dfc5-4d71-a750-3929ee757184",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -48,
+        0
+      ],
+      "webhookId": "7d0b301d-c06c-4945-9a15-0cec3204320e",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "You are a personal AI assistant. You are connected to the following tools in MCP servers:\n- google calendar\n- google drive\n- gmail\n- x twitter\n- linkedin\n- utility tools like view current datetime, http request to search the web, download files and images\n\nAlways use the \"Format Date Time\" tool when the user's query involves scheduling, deadlines, time comparisons, or creating calendar events. Never assume today's date. Always ask user if you're unsure about anything, dont assume.\n\nYou will receive a discord message containing the text\n"
+        }
+      },
+      "id": "74a81a6e-33a8-4e46-8037-12a4711f70d9",
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1216,
+        -48
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Webhook').item.json.body.guild.id }}"
+        },
+        "channelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Webhook').item.json.body.channel.id }}"
+        },
+        "content": "={{ $json.content }}",
+        "options": {
+          "message_reference": "={{ $('Webhook').item.json.body.message_id }}"
+        }
+      },
+      "id": "b54a76e7-0937-42ea-890f-499ee96de6a4",
+      "name": "Discord - reply meow",
+      "type": "n8n-nodes-base.discord",
+      "position": [
+        2464,
+        -48
+      ],
+      "webhookId": "d20702a4-64e9-43e3-9259-b53bbf4f617e",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "69426878-d7aa-4200-b8c7-c979c59dfed6",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        768,
+        160
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Update the description, date, time and summary of an event in Google Calendar",
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "your@email.com",
+          "cachedResultName": "your@email.com"
+        },
+        "eventId": "={{ $fromAI(\"EVENT_ID\", \"id of the event that wants to be deleted\", \"string\") }}",
+        "updateFields": {
+          "description": "={{ $fromAI(\"event_description\", \"The event description\", \"string\") }}",
+          "end": "={{ $fromAI(\"end\", \"End of the event with date, time and local timezone \", \"string\") }}",
+          "start": "={{ $fromAI(\"start\", \"Start of the event with date, time and local timezone\", \"string\") }}",
+          "summary": "={{ $fromAI(\"event_title\", \"The event title\", \"string\") }}"
+        }
+      },
+      "id": "7e00f36e-e24f-40a1-86ad-067b541cd731",
+      "name": "UpdateEvent",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        208,
+        624
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "your@email.com",
+          "cachedResultName": "your@email.com"
+        },
+        "eventId": "={{ $fromAI('Event_ID', 'id of the event that wants to be deleted', 'string') }}",
+        "options": {}
+      },
+      "id": "710f90c0-e68e-4b58-b354-55eafa49747b",
+      "name": "DeleteEvent",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        320,
+        624
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "path": "personal-calendar"
+      },
+      "id": "152d1d9a-461c-4276-8506-478dba2d3a06",
+      "name": "Google Calendar MCP",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "position": [
+        0,
+        416
+      ],
+      "webhookId": "f9d9d5ea-6f83-42c8-ae50-ee6c71789bca",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Google Calendar MCP tools",
+        "height": 440,
+        "width": 620,
+        "color": 5
+      },
+      "id": "a5c3de8c-16bc-4885-be87-89496e3d1426",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        336
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Google Mail MCP tools",
+        "height": 900,
+        "width": 900,
+        "color": 5
+      },
+      "id": "f51a64af-3d2b-4f06-bf0c-41558d240d27",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1840,
+        336
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Linkedin MCP tools",
+        "height": 440,
+        "width": 620,
+        "color": 5
+      },
+      "id": "a2533007-d49a-459e-b5d5-cb6ce3d6b2c7",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        800
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Twitter MCP",
+        "height": 440,
+        "width": 620,
+        "color": 5
+      },
+      "id": "58bcc621-b9dc-4361-940f-440afedaa271",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        528,
+        800
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a post using an image in LinkedIn",
+        "person": "e06nLqZHQo",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', `text of the linkedin post`, 'string') }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {
+          "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', `title of the linkedin post`, 'string') }}"
+        }
+      },
+      "id": "615fc799-dea9-448b-aa9c-42999c102199",
+      "name": "post image on personal linkedin",
+      "type": "n8n-nodes-base.linkedInTool",
+      "position": [
+        -32,
+        1088
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get recent email messages in Gmail",
+        "operation": "getAll",
+        "filters": {}
+      },
+      "id": "adc22d91-e7c0-4778-881b-7cccce6e4a1c",
+      "name": "Get many messages in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        1920,
+        640
+      ],
+      "webhookId": "cd12e91c-ed46-40f4-8540-6ace25c53a38",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Search for a user based on their username in x twitter",
+        "resource": "user",
+        "user": {
+          "__rl": true,
+          "mode": "username",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('User', ``, 'string') }}"
+        }
+      },
+      "id": "ff9f9b4f-07f5-4fef-8a04-7cd1bd0ae6b6",
+      "name": "search for a User in X",
+      "type": "n8n-nodes-base.twitterTool",
+      "position": [
+        576,
+        1056
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://n8n.yourdomain.com/mcp/personal-calendar/sse",
+        "options": {}
+      },
+      "id": "f06614fb-136e-4755-a6ec-e5e06321db6c",
+      "name": "Personal calendar",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        1104,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://n8n.yourdomain.com/mcp/personal-email/sse",
+        "options": {}
+      },
+      "id": "f4f5c7e1-ffe1-4cd2-b417-4095f1894280",
+      "name": "personal email",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        1296,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://n8n.yourdomain.com/mcp/personal-linkedin/sse",
+        "options": {}
+      },
+      "id": "4da1cd74-cab6-435b-8d79-f6ee724abd8c",
+      "name": "personal linkedin",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        1488,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://n8n.yourdomain.com/mcp/personal-twitter/sse",
+        "options": {}
+      },
+      "id": "7a1aeefe-818e-4428-b200-ef143e0a7663",
+      "name": "personal twitter",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        1664,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.channel.id }}"
+      },
+      "id": "6e2c27da-26d4-4c10-95f6-d6c892f92455",
+      "name": "MongoDB Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "position": [
+        944,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "const maxLength = 2000;\nconst fullText = $input.first().json.output;\n\nconst messages = [];\nfor (let i = 0; i < fullText.length; i += maxLength) {\n  messages.push({ content: fullText.slice(i, i + maxLength) });\n}\n\nreturn messages;\n"
+      },
+      "id": "cef4dbea-282c-4622-919b-69341c22ac2d",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2256,
+        -48
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## utility tools",
+        "height": 440,
+        "width": 620,
+        "color": 5
+      },
+      "id": "f94187f5-56e7-4d6e-804e-85207ef14df4",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        528,
+        336
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to browse a URL and returns the response data. ",
+        "url": "={{ $fromAI('URL', `url to search the web, download an image or download a document`, 'string') }}",
+        "options": {}
+      },
+      "id": "9dabfd63-f1f7-4752-a097-39c26b0d75bd",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [
+        864,
+        640
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "content": "## Google Drive MCP",
+        "height": 900,
+        "width": 620,
+        "color": 5
+      },
+      "id": "33d1eed2-3c75-47d9-8db9-26d7ea4d9b45",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1184,
+        336
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "personal-email"
+      },
+      "id": "8b6fc372-6113-4eb3-abd2-2542cc9c3a7e",
+      "name": "Google Mail MCP tools",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "position": [
+        1936,
+        416
+      ],
+      "webhookId": "f9d9d5ea-6f83-42c8-ae50-ee6c71789bca",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "utility-tools"
+      },
+      "id": "1ea61a61-42e3-439b-b989-abb87bee1793",
+      "name": "utility tools",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "position": [
+        656,
+        416
+      ],
+      "webhookId": "f9d9d5ea-6f83-42c8-ae50-ee6c71789bca",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "personal-linkedin"
+      },
+      "id": "6b99c4bc-8003-4e82-8667-f515e19b4fc7",
+      "name": "Linkedin MCP tools",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "position": [
+        0,
+        880
+      ],
+      "webhookId": "f9d9d5ea-6f83-42c8-ae50-ee6c71789bca",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "personal-twitter"
+      },
+      "id": "61bbdef5-6379-4f43-a3d7-11aaecd478b2",
+      "name": "Twitter MCP",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "position": [
+        544,
+        864
+      ],
+      "webhookId": "f9d9d5ea-6f83-42c8-ae50-ee6c71789bca",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://n8n.yourdomain.com/mcp/utility-tools/sse",
+        "options": {}
+      },
+      "id": "8cf7a19b-caa7-4b81-bb9e-f6f77ea27da3",
+      "name": "utility tools1",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        1824,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "personal-google-drive"
+      },
+      "id": "36395bd8-9855-4225-9403-5bdffd7e8e73",
+      "name": "Google Drive MCP",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "position": [
+        1360,
+        448
+      ],
+      "webhookId": "f9d9d5ea-6f83-42c8-ae50-ee6c71789bca",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search_Query', `name of the folder or file to search for`, 'string') }}",
+        "filter": {},
+        "options": {}
+      },
+      "id": "036d4120-7e62-43e2-986c-cfa5838e8aa6",
+      "name": "Search files and folders in Google Drive",
+      "type": "n8n-nodes-base.googleDriveTool",
+      "position": [
+        1248,
+        1040
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Search for a keywords in twitter",
+        "operation": "search",
+        "searchText": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search_Term', `search keyword to search twitter`, 'string') }}",
+        "limit": 20,
+        "additionalFields": {}
+      },
+      "id": "835a0481-0d93-4671-a6bb-939809c790de",
+      "name": "search keyword in twitter",
+      "type": "n8n-nodes-base.twitterTool",
+      "position": [
+        864,
+        1056
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to get the current user's @jharilela twitter account details",
+        "jsCode": "return {json: {\n  \"id\": \"1164082728121204736\",\n  \"name\": \"Jayant harilela\",\n  \"username\": \"JHarilela\"\n}}"
+      },
+      "id": "f32ffab5-a303-40d1-a1c2-892a0df52df4",
+      "name": "Code Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [
+        1008,
+        896
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Send a DM (Direct Message) to a username on twitter x",
+        "resource": "directMessage",
+        "user": {
+          "__rl": true,
+          "mode": "username",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('User', `the username that we want to DM`, 'string') }}"
+        },
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', `text message to send to a user`, 'string') }}",
+        "additionalFields": {}
+      },
+      "id": "2a8bef98-1f60-4260-974f-a23e1a9c8839",
+      "name": "send a DM",
+      "type": "n8n-nodes-base.twitterTool",
+      "position": [
+        720,
+        1056
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', `text content of the tweet that you want to post`, 'string') }}",
+        "additionalFields": {}
+      },
+      "id": "d1894fbe-9cec-4077-b9d7-eba2ec15adba",
+      "name": "Create Tweet in X",
+      "type": "n8n-nodes-base.twitterTool",
+      "position": [
+        1008,
+        1056
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a text only post in Linkedin",
+        "person": "e06nLqZHQo",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', `main text of the linkedin article post`, 'string') }}",
+        "additionalFields": {}
+      },
+      "id": "331bd1c6-3efc-4dda-8f28-90381879028e",
+      "name": "post text on linkedin",
+      "type": "n8n-nodes-base.linkedInTool",
+      "position": [
+        320,
+        1088
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a post referring to an external article via url in LinkedIn",
+        "person": "e06nLqZHQo",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', `main text of the linkedin article post`, 'string') }}",
+        "shareMediaCategory": "ARTICLE",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', `main description of the linkedin article post`, 'string') }}",
+          "originalUrl": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Original_URL', `original article of the linkedin article post`, 'string') }}",
+          "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', `main title of the linkedin article post`, 'string') }}"
+        }
+      },
+      "id": "91701ee7-d377-4faf-8850-e9a4bef692cd",
+      "name": "post article with url on linkedin",
+      "type": "n8n-nodes-base.linkedInTool",
+      "position": [
+        160,
+        1088
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "87b6eae7-b38c-49ce-a262-9992e2cae319",
+      "name": "Think",
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "position": [
+        2144,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "height": 440,
+        "width": 2880,
+        "color": 4
+      },
+      "id": "ce67a3cf-bd5c-48b3-b3b2-7c3efc7137f6",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        -128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Upload file in Google Drive",
+        "name": "={{ $fromAI(\"file_name\", \"The name of the file\", \"string\") }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Folder', `folder of the uploaded file, use 'root' by default unless mentioned otherwise`, 'string') }}"
+        },
+        "options": {}
+      },
+      "id": "0ff0116f-cc81-40dc-ac30-4399fce005e6",
+      "name": "Upload file in Google Drive",
+      "type": "n8n-nodes-base.googleDriveTool",
+      "position": [
+        1264,
+        640
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', `file id that wants to be shared`, 'string') }}"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "user",
+            "emailAddress": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_Address', `email of the user who we want to share a read only access to the file`, 'string') }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "9b6560b6-520d-41c6-9519-6fdf631bcf64",
+      "name": "Share file in Google Drive",
+      "type": "n8n-nodes-base.googleDriveTool",
+      "position": [
+        1440,
+        640
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', `file id of the document that we want to move`, 'string') }}"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Drive', `parent drive id of the destination where we want to move the folder to`, 'string') }}"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Folder', `parent folder id of the destination where we want to move the folder to`, 'string') }}"
+        }
+      },
+      "id": "0ea90762-a60b-4ee8-95d6-421eddc14300",
+      "name": "Move file in Google Drive",
+      "type": "n8n-nodes-base.googleDriveTool",
+      "position": [
+        1616,
+        640
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', `id of the file that wants to be downloaded`, 'string') }}"
+        },
+        "options": {}
+      },
+      "id": "8c04c079-55e6-4686-8b10-67f708f11a39",
+      "name": "Download file in Google Drive",
+      "type": "n8n-nodes-base.googleDriveTool",
+      "position": [
+        1264,
+        848
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $fromAI(\"folder_name\", \"Name of the folder that wants to be created\", \"string\") }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "5ed9cdc7-f426-4dc6-bc85-6a72316cec48",
+      "name": "Create folder in Google Drive",
+      "type": "n8n-nodes-base.googleDriveTool",
+      "position": [
+        1456,
+        848
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "share",
+        "folderNoRootId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Folder', `id of the folder that wants to be shared`, 'string') }}"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "user",
+            "emailAddress": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_Address', `email of the person that we want to share the google drive folder to`, 'string') }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "d61d588a-2d4a-4edf-8a95-05006fc93212",
+      "name": "Share folder in Google Drive",
+      "type": "n8n-nodes-base.googleDriveTool",
+      "position": [
+        1648,
+        848
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get shared drive in Google Drive",
+        "resource": "drive",
+        "operation": "get",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "0ANDMDFgYA6nqUk9PVA"
+        },
+        "options": {}
+      },
+      "id": "1732ef5c-8075-4641-b239-3bbf7d13ce5f",
+      "name": "Get shared drive in Google Drive",
+      "type": "n8n-nodes-base.googleDriveTool",
+      "position": [
+        1456,
+        1040
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get a list of shared drives in Google Drive",
+        "resource": "drive",
+        "operation": "list",
+        "limit": 10,
+        "options": {}
+      },
+      "id": "ef03da7e-c486-4495-bc34-7cb5d3e6fa53",
+      "name": "Get many shared drives in Google Drive",
+      "type": "n8n-nodes-base.googleDriveTool",
+      "position": [
+        1648,
+        1040
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', `message id that we want to reply to `, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `reply message that we want to send`, 'string') }}",
+        "options": {}
+      },
+      "id": "ce523a8b-4e39-46c8-adb7-64d1a1acb03f",
+      "name": "Reply to a message in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        2304,
+        640
+      ],
+      "webhookId": "564d0d41-cbfa-45b0-9af9-90765b60105a",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "getAll",
+        "limit": 20,
+        "options": {}
+      },
+      "id": "f6f01d0e-8ef8-4b10-b2a5-4f05905cb6db",
+      "name": "Get many drafts in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        1904,
+        1056
+      ],
+      "webhookId": "dd41e03f-b056-45b2-8389-8ba5ec2e2782",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "get",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Draft_ID', `draft id of a gmail message`, 'string') }}",
+        "options": {}
+      },
+      "id": "dcfee091-9113-4e3e-b35f-f348615a71b7",
+      "name": "Get a draft in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        2096,
+        1056
+      ],
+      "webhookId": "6cda08e0-01dc-4c99-bf01-c9562428f89b",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', `subject of the email draft`, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `text content of the email draft`, 'string') }}",
+        "options": {
+          "ccList": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('CC', `cc email address`, 'string') }}",
+          "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To_Email', `recipient email address`, 'string') }}"
+        }
+      },
+      "id": "6314c3cb-7a3d-4d06-ba90-fa77a792b9a7",
+      "name": "Create a draft in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        2304,
+        1056
+      ],
+      "webhookId": "1886deba-2b0e-4fe2-8b92-1eaa101dde01",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "limit": 20,
+        "filters": {
+          "q": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search', `gmail search operator. To search email from a certain sender, start with from: . To search emails with a certain subject, start with subject:`, 'string') }}"
+        }
+      },
+      "id": "d279a4b9-e14f-4a3c-b207-065f1023335f",
+      "name": "Get many threads in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        2096,
+        640
+      ],
+      "webhookId": "f78a8dcd-2dec-4708-8b9e-981e6115d368",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "get",
+        "threadId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Thread_ID', `thread id of ta gmail message or conversation history`, 'string') }}",
+        "options": {}
+      },
+      "id": "f44f4192-653b-4dbf-8e6c-52be759c145f",
+      "name": "Get a thread in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        1904,
+        864
+      ],
+      "webhookId": "f78a8dcd-2dec-4708-8b9e-981e6115d368",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "resource": "label"
+      },
+      "id": "3ee4ffaa-a464-4a94-9909-313bedb0b01b",
+      "name": "Get many labels in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        2096,
+        864
+      ],
+      "webhookId": "59ed5561-3e25-42d8-91fa-54a9ae371c81",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', `recipient email address`, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', `subject of the email to send`, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `email message content to be sent`, 'string') }}",
+        "options": {
+          "appendAttribution": false,
+          "ccList": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('CC', `cc email addresses (optional)`, 'string') }}"
+        }
+      },
+      "id": "51ea5804-7e54-476e-9029-510c380265a2",
+      "name": "Send a message in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        2480,
+        864
+      ],
+      "webhookId": "3ef63c87-0250-40e8-94c6-b64164366891",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://n8n.yourdomain.com/mcp/personal-google-drive/sse",
+        "options": {}
+      },
+      "id": "4f6e7da5-76b4-43ff-9037-0bebbff484b8",
+      "name": "google drive",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        1984,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Search for emails ive sent",
+        "operation": "getAll",
+        "filters": {
+          "q": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search', `gmail search operator. To search for subject with certain keywords, use the operator Subject: `, 'string') }}",
+          "sender": "your@email.com"
+        }
+      },
+      "id": "8d990262-b959-4180-80fd-071740e68013",
+      "name": "search sent emails",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        2480,
+        640
+      ],
+      "webhookId": "cd12e91c-ed46-40f4-8540-6ace25c53a38",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get recent emails ive sent",
+        "operation": "getAll",
+        "filters": {
+          "sender": "your@email.com"
+        }
+      },
+      "id": "40d938a6-671a-4524-b66e-e680905d1b06",
+      "name": "Get emails sent",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        2304,
+        864
+      ],
+      "webhookId": "cd12e91c-ed46-40f4-8540-6ace25c53a38",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Search emails received",
+        "operation": "getAll",
+        "filters": {
+          "q": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search', `keywords in the subject that we are searching for. Use google search operator. To search for keywords in the subject, start with Subject: `, 'string') }}"
+        }
+      },
+      "id": "2ca33b93-8c84-4644-bb28-370cbe548313",
+      "name": "search emails received",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        2480,
+        1056
+      ],
+      "webhookId": "cd12e91c-ed46-40f4-8540-6ace25c53a38",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "your@email.com",
+          "cachedResultName": "your@email.com"
+        },
+        "limit": "=50",
+        "timeMin": "={{ $fromAI(\"after\", \"Search events after date, time and local timezone \", \"string\") }}",
+        "timeMax": "={{ $fromAI(\"before\", \"Search events before date, time and local timezone\", \"string\") }}",
+        "options": {}
+      },
+      "id": "980bb281-7aac-4b92-b92c-ac4eb11d0ada",
+      "name": "SearchEvent",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        -80,
+        640
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "your@email.com",
+          "cachedResultName": "your@email.com"
+        },
+        "start": "={{ $fromAI(\"start\", \"Event Start date, time and local timezone\", \"string\") }}",
+        "end": "={{ $fromAI(\"end\", \"Event End date, time and local timezone\", \"string\") }}",
+        "additionalFields": {
+          "attendees": [],
+          "description": "={{ $fromAI(\"event_description\", \"The event description\", \"string\") }}",
+          "summary": "={{ $fromAI(\"event_title\", \"The event title\", \"string\") }}"
+        }
+      },
+      "id": "e40b0e97-b3a1-4c54-8d94-9717f45ecb0b",
+      "name": "CreateEvent",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        64,
+        640
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Add attendees to an event",
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "your@email.com",
+          "cachedResultName": "your@email.com"
+        },
+        "eventId": "={{ $fromAI(\"EVENT_ID\", \"id of the event that wants to be deleted\", \"string\") }}",
+        "updateFields": {
+          "attendeesUi": {
+            "values": {
+              "attendees": [
+                "={{ $fromAI('attendees0_Attendees', 'email addresses of the people that needs to be invited to the event', 'string') }}"
+              ]
+            }
+          }
+        }
+      },
+      "id": "b1fada32-e5d8-46e8-b3d1-9cbecbfab95a",
+      "name": "addAttendeesToEvent",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        336,
+        448
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Format date to yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+        "operation": "formatDate",
+        "date": "={{ $fromAI(\"date\", \"date string that wants to be formated\", \"string\") }}",
+        "format": "custom",
+        "customFormat": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+        "options": {}
+      },
+      "id": "82ba0344-ae80-4cbd-8151-c683739933d3",
+      "name": "Format Date Time",
+      "type": "n8n-nodes-base.dateTimeTool",
+      "position": [
+        720,
+        640
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "get current date and time",
+        "options": {}
+      },
+      "id": "a1b5cfd7-d589-4f6a-b269-ae8e9f77a231",
+      "name": "get current date time",
+      "type": "n8n-nodes-base.dateTimeTool",
+      "position": [
+        560,
+        640
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Download a file or image from a URL",
+        "url": "={{ $fromAI('URL', `url to search the web, download an image or download a document`, 'string') }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "ead93fe6-24a6-481e-a1af-86c3f6e9e1ab",
+      "name": "HTTP Download a file or image",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [
+        1008,
+        640
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "operation": "get",
+        "guildId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.body.guild.id }}"
+        },
+        "channelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.body.channel.id }}"
+        },
+        "messageId": "={{ $json.body.message_id }}",
+        "options": {}
+      },
+      "id": "aedb7cb4-e0e3-4331-a8be-6fb977c1cbd8",
+      "name": "Get a message",
+      "type": "n8n-nodes-base.discord",
+      "position": [
+        176,
+        0
+      ],
+      "webhookId": "52302761-93ee-436b-b76c-773ebe73175f",
+      "typeVersion": 2
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Discord - reply meow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Twitter MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send a DM": {
+      "ai_tool": [
+        [
+          {
+            "node": "Twitter MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CreateEvent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Calendar MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeleteEvent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Calendar MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SearchEvent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Calendar MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UpdateEvent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Calendar MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "utility tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "google drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "personal email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "utility tools1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get emails sent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Date Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "utility tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "personal twitter": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Tweet in X": {
+      "ai_tool": [
+        [
+          {
+            "node": "Twitter MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Personal calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "personal linkedin": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search sent emails": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "addAttendeesToEvent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Calendar MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a draft in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a thread in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get current date time": {
+      "ai_tool": [
+        [
+          {
+            "node": "utility tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post text on linkedin": {
+      "ai_tool": [
+        [
+          {
+            "node": "Linkedin MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search emails received": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search for a User in X": {
+      "ai_tool": [
+        [
+          {
+            "node": "Twitter MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many drafts in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many labels in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many threads in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Drive MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search keyword in twitter": {
+      "ai_tool": [
+        [
+          {
+            "node": "Twitter MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Drive MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Mail MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Drive MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share folder in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Drive MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Drive MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Drive MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Download a file or image": {
+      "ai_tool": [
+        [
+          {
+            "node": "utility tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post image on personal linkedin": {
+      "ai_tool": [
+        [
+          {
+            "node": "Linkedin MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get shared drive in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Drive MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post article with url on linkedin": {
+      "ai_tool": [
+        [
+          {
+            "node": "Linkedin MCP tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many shared drives in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Drive MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Drive MCP",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f5b64bda-1e48-4384-934f-c127b76b171b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0b4d4d7be3ea3711d799d4193b91b2fc9810c5f560690f4337ed8412849657b6"
+  },
+  "id": "VyQqWxNQU7qoVopY",
+  "tags": []
+}
