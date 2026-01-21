@@ -26,7 +26,7 @@ To test the agent logic separately from the main system:
 2. Start the agent server:
 
 ```bash
-langgraph dev --allow-blocking
+langgraph dev --allow-blocking --no-browser
 ```
 
 Contribute your .json workflow files to the workflows folder.
