@@ -28,5 +28,5 @@ To test the agent logic separately from the main system:
 ```bash
 langgraph dev --allow-blocking --no-browser
 ```
-The current database contains 150 workflows from the workflow collection; more workflows  will  improve the agent's performance and accuracy.
+The current vector db  contains 150 workflows from the workflow collection; more workflows  will  improve the agent's performance and accuracy.
 Contribute your n8n .json workflow files to the workflows folder.
