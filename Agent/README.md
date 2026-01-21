@@ -22,8 +22,17 @@ To make requests to the agent server (at localhost:2024), you must include the f
 
 To test the agent logic separately from the main system:
 
-1. Fill in the `.env` file (see `.env.example`).
-2. Start the agent server:
+1. Create a virtual environment and install dependencies:
+  macOS/Linux:
+  ```bash
+  python3 -m venv .venv && source .venv/bin/activate && pip install -e .
+  ```
+Windows:
+  ```bash
+  python -m venv .venv; .venv\Scripts\activate; pip install -e .
+  ```
+2. Fill in the `.env` file (see `.env.example`).
+3. Start the agent server:
 
 ```bash
 langgraph dev --allow-blocking --no-browser
