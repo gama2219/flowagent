@@ -1,0 +1,341 @@
+{
+  "name": "Scrape recent news about a company before a call",
+  "nodes": [
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "apiKey",
+              "stringValue": "32aa914c947342169c4998b6701a77e0"
+            },
+            {
+              "name": "newsAge",
+              "type": "numberValue",
+              "numberValue": "10"
+            },
+            {
+              "name": "maxArticles",
+              "stringValue": "20"
+            },
+            {
+              "name": "emails"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "21a684fa-ff28-4601-a13f-d5d37f804afa",
+      "name": "Setup",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        224,
+        368
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "companyName",
+              "stringValue": "={{ $json.summary.toLowerCase().replace('meeting with', '').replace('call with', '').trim() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cd83d474-db0c-4fa8-99fb-c2646e4a932c",
+      "name": "Extract company name",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        912,
+        160
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "content": "### Latest company news before a call\n\nThis workflow will send you a list of latest news about a company for every meeting in your calendar each day, keeping you up to date with your leads and meeting partners.\n",
+        "height": 192,
+        "width": 436,
+        "color": 4
+      },
+      "id": "f6b9ba44-6b86-4e05-bde6-b9ec1b44ad2d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "5ac5be0a-bde5-41ad-b69b-2fe38d47c0cc",
+      "name": "Every morning @ 7",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        0,
+        368
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "bcfb06b1-d365-43a8-9802-869529baca98",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              },
+              "leftValue": "={{ $json.summary.toLowerCase() }}",
+              "rightValue": "call with"
+            },
+            {
+              "id": "4ea43ccf-d586-4985-87db-fc1e9f734351",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              },
+              "leftValue": "={{ $json.summary.toLowerCase() }}",
+              "rightValue": "meeting with"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ac410286-6ee0-4a50-84ca-6c0f4d685a5d",
+      "name": "Filter meetings",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        640,
+        368
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "=https://newsapi.org/v2/everything?apiKey={{ $('Setup').first().json.apiKey }}&q={{ $json.companyName }}&from={{ DateTime.now().minus({ days: $('Setup').first().json.newsAge }).toFormat('yyyy-MM-dd') }}&sortBy=publishedAt&language=en&pageSize={{ $('Setup').first().json.maxArticles }}&searchIn=title",
+        "options": {}
+      },
+      "id": "83a946ff-73c2-483e-b3f8-8ada42cec5d9",
+      "name": "Get latest news",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1104,
+        160
+      ],
+      "typeVersion": 4.1
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let html = `<table style=\"width: 100%\">`;\nhtml += '</table>';\n\nfor(article of $input.item.json.articles) {\n  console.log(article)\n  html += `\n    <tr>\n      <td style=\"display: flex; background-color: #f2f4f8; font-family: sans-serif; padding: 0.3em 0.5em\">\n        <div style=\"padding: 1em\">\n          <a style=\"display: block; margin-bottom: 10px; font-size: 1.2em\" href=\"${article.url}\">${article.title}</a>\n          <i>\n            ${article.description ? article.description : article.content}\n          </i>\n          <div style=\"margin-top: 1em\">\n            ${ article.source?.name ? '<b>Source:</b> ' + article.source?.name : '' }\n          </div>\n        </div>\n      </td>\n    </tr>\n  `\n}\nreturn { \"html\": html };"
+      },
+      "id": "094a046d-ea9a-44fb-ad94-0fb276880da4",
+      "name": "Format for email",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1312,
+        160
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Setup').first().json.emails }}",
+        "subject": "=Latest news for '{{ $('Extract company name').item.json.summary }}'",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "62e93bbc-87a7-4424-ad4a-4cfbf660c372",
+      "name": "Send news",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1504,
+        160
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "dd2ea22c-6019-4c58-b9e7-a189f693660f"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n### Configure your workflow here\n1. `apiKey` - Your API key for [News API](https://newsapi.org)\n2. `newsAge` - How old should news be, in days\n3. `maxArticles` - Number of articles that will be sent, max 100\n4. `emails`- List of email addresses that should receive the news, separated by commas",
+        "height": 511.499984507795
+      },
+      "id": "028ed0a1-b0fa-4a97-9dac-d85e46ba84ca",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\nThis will get all meetings that start with *Meeting with* or *Call with* but feel free to update the filter to suit your needs.",
+        "height": 275.2500697149263,
+        "width": 231.52514020446353
+      },
+      "id": "061b38ae-99dd-49f1-8955-f1b36c58f3de",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        624,
+        352
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "0f84a893-0c52-45ea-b103-8d8b65550fd8",
+      "name": "No meetings today",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1504,
+        384
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "user@example.com",
+          "cachedResultName": "user@example.com"
+        },
+        "options": {
+          "timeMin": "={{ $today }}",
+          "timeMax": "={{ $today.plus({ days: 1 }) }}",
+          "singleEvents": true
+        }
+      },
+      "id": "dbc266cd-1aa8-45ad-9b8c-3276c1059a81",
+      "name": "Get meetings for today",
+      "type": "n8n-nodes-base.googleCalendar",
+      "position": [
+        464,
+        368
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Setup": {
+      "main": [
+        [
+          {
+            "node": "Get meetings for today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter meetings": {
+      "main": [
+        [
+          {
+            "node": "Extract company name",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No meetings today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get latest news": {
+      "main": [
+        [
+          {
+            "node": "Format for email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format for email": {
+      "main": [
+        [
+          {
+            "node": "Send news",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every morning @ 7": {
+      "main": [
+        [
+          {
+            "node": "Setup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract company name": {
+      "main": [
+        [
+          {
+            "node": "Get latest news",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get meetings for today": {
+      "main": [
+        [
+          {
+            "node": "Filter meetings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c12188cc-d049-4836-9936-e0d3d113909e",
+  "meta": {
+    "instanceId": "0b4d4d7be3ea3711d799d4193b91b2fc9810c5f560690f4337ed8412849657b6"
+  },
+  "id": "XxLupukqiJChuohD",
+  "tags": []
+}

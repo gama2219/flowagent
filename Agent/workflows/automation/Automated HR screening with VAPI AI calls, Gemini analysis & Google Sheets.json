@@ -1,0 +1,551 @@
+{
+  "name": "Automated HR screening with VAPI AI calls, Gemini analysis & Google Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1bj_wgQyqusAX_ar4kyHX0Ws0Gd5NP50Sf-1ukNawZT8",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bj_wgQyqusAX_ar4kyHX0Ws0Gd5NP50Sf-1ukNawZT8/edit?usp=drivesdk",
+          "cachedResultName": "HR Calling Data"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bj_wgQyqusAX_ar4kyHX0Ws0Gd5NP50Sf-1ukNawZT8/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "id": "610be21f-3e78-445f-a5a0-44f130bcaeff",
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "position": [
+        -1488,
+        -48
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vapi.ai/call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer <Token>"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"assistantId\": \"394aa072-2678-4ac3-a5da-2843b6173984\",\n  \"phoneNumberId\": \"79c489ec-e4e2-46a5-bba8-33d245b37cc6\",\n  \"customer\": {\n    \"numberE164CheckEnabled\": true,\n    \"number\": \"+1234567890\"\n  }\n}",
+        "options": {}
+      },
+      "id": "51bcc03c-6f6c-4f16-8212-9667039a3efc",
+      "name": "Make a Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -832,
+        -48
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "https://api.vapi.ai/call/<ID>",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer <Token>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2e904cfb-cfe9-43bc-b6d8-1d2a50306e15",
+      "name": "Get Call Transcript",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -608,
+        -48
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-05-20",
+        "options": {}
+      },
+      "id": "cb14a02d-cced-4704-ae4a-13a767bd7805",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        -368,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"Total Work Experience\": {\n      \"type\": \"string\",\n      \"description\": \"Total years/months of professional experience\",\n      \"default\": \"Not mentioned\"\n    },\n    \"Current CTC\": {\n      \"type\": \"string\",\n      \"description\": \"Current annual cost to company\",\n      \"default\": \"Not mentioned\"\n    },\n    \"Expected CTC\": {\n      \"type\": \"string\",\n      \"description\": \"Expected annual cost to company\",\n      \"default\": \"Not mentioned\"\n    },\n    \"Current Notice Period\": {\n      \"type\": \"string\",\n      \"description\": \"Notice period duration\",\n      \"default\": \"Not mentioned\"\n    },\n    \"Is Notice Period Negotiable\": {\n      \"type\": \"string\",\n      \"enum\": [\"Yes\", \"No\", \"Not mentioned\"],\n      \"default\": \"Not mentioned\"\n    },\n    \"Current Place of Residence\": {\n      \"type\": \"string\",\n      \"default\": \"Not mentioned\"\n    },\n    \"Open for Work from Office\": {\n      \"type\": \"string\",\n      \"enum\": [\"Yes\", \"No\", \"Not mentioned\"],\n      \"default\": \"Not mentioned\"\n    },\n    \"Any Questions to Get Back\": {\n      \"type\": \"string\",\n      \"enum\": [\"Yes\", \"No\"],\n      \"default\": \"No\"\n    },\n    \"All Information Collected\": {\n      \"type\": \"string\",\n      \"enum\": [\"Yes\", \"No\"],\n      \"default\": \"No\"\n    },\n    \"Need a Call Back\": {\n      \"type\": \"string\",\n      \"enum\": [\"Yes\", \"No\"],\n      \"default\": \"Yes\"\n    },\n    \"Callback Time\": {\n      \"type\": \"string\",\n      \"description\": \"When the user prefers a callback\",\n      \"default\": \"Not specified by the user\"\n    },\n    \"Reason for Not able to collect Info\": {\n      \"type\": \"string\",\n      \"description\": \"Why information is not collected\",\n      \"default\": \"Not able to identify\"\n    }\n  },\n  \"required\": [\n    \"Total Work Experience\",\n    \"Current CTC\",\n    \"Expected CTC\",\n    \"Current Notice Period\",\n    \"Is Notice Period Negotiable\",\n    \"Current Place of Residence\",\n    \"Open for Work from Office\",\n    \"Any Questions to Get Back\",\n    \"All Information Collected\",\n    \"Need a Call Back\",\n    \"Callback Time\",\n    \"Reason for not able to collect Info\"\n  ]\n}"
+      },
+      "id": "53c07cfd-40b0-4769-81f1-39f932aec191",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -224,
+        144
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1bj_wgQyqusAX_ar4kyHX0Ws0Gd5NP50Sf-1ukNawZT8",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bj_wgQyqusAX_ar4kyHX0Ws0Gd5NP50Sf-1ukNawZT8/edit?usp=drivesdk",
+          "cachedResultName": "HR Calling Data"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bj_wgQyqusAX_ar4kyHX0Ws0Gd5NP50Sf-1ukNawZT8/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "value": {
+            "Current CTC": "={{ $json.output['Current CTC'] }}",
+            "Expected CTC": "={{ $json.output['Expected CTC'] }}",
+            "Calling Status": "={{ $json.output['Reason for Not able to collect Info'] }}",
+            "Current Notice Period": "={{ $json.output['Current Notice Period'] }}",
+            "Total Work Experience": "={{ $json.output['Total Work Experience'] }}",
+            "Open for Work from Office ?": "={{ $json.output['Open for Work from Office'] }}",
+            "Current place of residence ?": "={{ $json.output['Current Place of Residence'] }}",
+            "Is that Notice Period Negotiable ?": "={{ $json.output['Is Notice Period Negotiable'] }}"
+          },
+          "schema": [
+            {
+              "id": "First Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "First Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Last Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone No.",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Phone No.",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Current Company",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Current Company",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Work Experience",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Total Work Experience",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Current CTC",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Current CTC",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Expected CTC",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Expected CTC",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Current Notice Period",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Current Notice Period",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Is that Notice Period Negotiable ?",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Is that Notice Period Negotiable ?",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Current place of residence ?",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Current place of residence ?",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Open for Work from Office ?",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Open for Work from Office ?",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Any Questions to get back ?",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Any Questions to get back ?",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Calling Status",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Calling Status",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Phone No."
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "7057ddce-b6a4-4579-badb-21214a433184",
+      "name": "Update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        208,
+        -48
+      ],
+      "typeVersion": 4.6
+    },
+    {
+      "parameters": {
+        "content": "## Set up Trigger ##\nto to get candidate information for calling",
+        "height": 280,
+        "width": 440
+      },
+      "id": "bb3b5845-35ba-4f76-ac1d-6282c967efe9",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1584,
+        -144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## VAPI Trigger to call and Transcription ##\n",
+        "height": 320,
+        "width": 680
+      },
+      "id": "44271aa2-5514-4eb7-af0f-47ab148d4933",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1104,
+        -192
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Update back to Google Sheets\n",
+        "height": 260
+      },
+      "id": "dedfc737-7b22-4828-ad15-bed4d92ee867",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        -128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Parse the incoming call trascipt to extract the details such as \n- Total Work Experience\t\n- Current CTC\t\n- Expected CTC\t\n- Current Notice Period\t\n- Is that Notice Period Negotiable ?\t\n- Current place of residence ?\t\n- Open for Work from Office ?\t\n- Any Questions to get back ?  \n- All Information Collected\n- Do user need a call back ?\n- Yes then when should you call back ?\n- Reason for Not able to collec Information ?\n\nfrom the following input data:{{ $json.transcript }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a Call Data entry operator, whose job is to go through call transcript and do\n1. Understand the transcript and get the required information\n2. Understand if users as asked to call back or not.\n3. Understand if complete information is collected or not."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "c718f476-43ca-4a61-859a-8cbdc17562b1",
+      "name": "Call Data Analyser",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        -384,
+        -48
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1ac5433-077f-4512-ab3c-8b4f929c460f",
+              "name": "First name",
+              "type": "string",
+              "value": "={{ $json['First Name'] }}"
+            },
+            {
+              "id": "520e04d7-f16d-40dd-8bf4-4fabe3b8b2c1",
+              "name": "Last name",
+              "type": "string",
+              "value": "={{ $json['Last Name'] }}"
+            },
+            {
+              "id": "b55a39ac-5d1e-407c-9def-db719a99b308",
+              "name": "Phone No",
+              "type": "number",
+              "value": "={{ $json['Phone No.'] }}"
+            },
+            {
+              "id": "7822500e-9b0b-4f79-9beb-4f3ea46c7552",
+              "name": "Current Company",
+              "type": "string",
+              "value": "={{ $json['Current Company'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "70e953ad-a3ea-4495-a681-1d5ba06409e6",
+      "name": "Rename Required Fields",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1264,
+        -48
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "url": "https://api.vapi.ai/assistant/<ID>",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer <Token>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "31d19ba4-0565-4d4e-9d1c-9f15112c1d18",
+      "name": "Get VAPI Assistant",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -1040,
+        -48
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bfcc409c-b209-48ab-ba54-d615ade6885e",
+              "name": "output",
+              "type": "object",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "202ecc0b-9968-4762-b68a-a6ce8da0efc4",
+      "name": "Map Field Names",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -32,
+        -48
+      ],
+      "typeVersion": 3.4
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Make a Call": {
+      "main": [
+        [
+          {
+            "node": "Get Call Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Field Names": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Data Analyser": {
+      "main": [
+        [
+          {
+            "node": "Map Field Names",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get VAPI Assistant": {
+      "main": [
+        [
+          {
+            "node": "Make a Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Call Transcript": {
+      "main": [
+        [
+          {
+            "node": "Call Data Analyser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Rename Required Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename Required Fields": {
+      "main": [
+        [
+          {
+            "node": "Get VAPI Assistant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Call Data Analyser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Call Data Analyser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "59abbb84-54fc-4d85-90f7-6c3eb3befd8a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0b4d4d7be3ea3711d799d4193b91b2fc9810c5f560690f4337ed8412849657b6"
+  },
+  "id": "FllyAmD0gWBcOpNc",
+  "tags": []
+}

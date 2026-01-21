@@ -1,0 +1,91 @@
+{
+  "name": "Import data from MySQL into Google Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyWeek",
+              "hour": 5
+            }
+          ]
+        }
+      },
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "position": [
+        -672,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "b78026be-d1da-4ab1-8733-5e173958546e"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM books;"
+      },
+      "name": "MySQL - select",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -464,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "7a67f43a-1771-4e15-884d-b218e1f1f033"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "append",
+        "sheetId": "qwertz",
+        "options": {}
+      },
+      "name": "Google Sheets - write",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -272,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "b3d6ecbd-621e-42a3-901c-b1bc857f5ffc"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "MySQL - select",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL - select": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - write",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "55968680-589b-4448-af0e-0566bd724de8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0b4d4d7be3ea3711d799d4193b91b2fc9810c5f560690f4337ed8412849657b6"
+  },
+  "id": "VyQqWxNQU7qoVopY",
+  "tags": []
+}
