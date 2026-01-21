@@ -23,7 +23,8 @@ To make requests to the agent server (at localhost:2024), you must include the f
 To test the agent logic separately from the main system:
 
 1. Create a virtual environment and install dependencies:
-  macOS/Linux:
+
+macOS/Linux:
   ```bash
   python3 -m venv .venv && source .venv/bin/activate && pip install -e .
   ```
