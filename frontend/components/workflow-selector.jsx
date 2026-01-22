@@ -93,7 +93,7 @@ export function WorkflowSelector({ onSelect, onCancel }) {
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="new" id="new" />
-              <Label htmlFor="new">Create new workflow</Label>
+              <Label htmlFor="new">Create new Session</Label>
             </div>
           </RadioGroup>
 
