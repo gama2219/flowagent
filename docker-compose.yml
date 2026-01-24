@@ -4,7 +4,7 @@ services:
   langgraph-api:
     build: ./Agent
     env_file: .env 
-    stop_signal: SIGTERM
+    stop_signal: SIGINT
     stop_grace_period: 60s
     network_mode: "host"
     volumes:

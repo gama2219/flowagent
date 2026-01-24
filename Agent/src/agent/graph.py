@@ -11,7 +11,7 @@ agent_name=os.getenv('agent_name')
 model_= os.getenv('model')
 
 rate_limiter = InMemoryRateLimiter(
-    requests_per_second=2/60,  
+    requests_per_second=4/60,  
     check_every_n_seconds=0.1,
     max_bucket_size=2
 )
@@ -21,7 +21,8 @@ prompt_n8n_agent=prompt_template_n8n_agent.invoke({"tools": tools})
 
 model = init_chat_model(
     model_,
-    temperature=1
+    temperature=1,
+    rate_limiter=rate_limiter
     )
 
 
