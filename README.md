@@ -65,6 +65,12 @@ podman-compose up
 
 The application will be available at http://localhost:3000.
 
+To stop and remove containers: Press Ctrl + C to stop the process, then run:
+
+    Docker: docker compose down
+
+    Podman: podman-compose down
+
 
 ### 🤝 Contributing
 
