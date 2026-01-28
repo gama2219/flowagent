@@ -28,6 +28,10 @@ You will also need:
 git clone https://github.com/gama2219/flowagent.git
 ```
 
+### Navigate into the project directory:
+
+    cd flowagent
+
 ### 1️⃣ Initialize the Database
 
 > **⚠️ IMPORTANT**
