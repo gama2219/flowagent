@@ -43,7 +43,7 @@ export async function serverUpdateProfile(userId: string, updates: Record<string
       return { error: error.message, data: null }
     }
 
-    revalidatePath("/dashboard")
+    revalidatePath("/flowagent")
     return { data, error: null }
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Failed to update profile", data: null }
@@ -81,7 +81,7 @@ export async function serverSignUp(email: string, password: string, fullName: st
         },
         emailRedirectTo:
           process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-          `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard`,
+          `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/flowagent`,
       },
     })
 
@@ -95,22 +95,22 @@ export async function serverSignUp(email: string, password: string, fullName: st
   }
 }
 
-export async function fetchactivesession(){
-  try{
+export async function fetchactivesession() {
+  try {
     const supabase = await createClient()
     const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  return session
+      data: { session },
+    } = await supabase.auth.getSession()
+    return session
 
-  }catch(err){
-    return  {error:err}
+  } catch (err) {
+    return { error: err }
 
   }
 
 }
 
-  
+
 export async function serverResetPassword(email: string) {
   try {
     const supabase = await createClient()

@@ -2,11 +2,11 @@
 
 import { useState, useEffect, createContext, useContext } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { serverSignOut, serverFetchProfile, serverUpdateProfile,fetchactivesession } from "@/lib/supabase/auth-actions"
+import { serverSignOut, serverFetchProfile, serverUpdateProfile, fetchactivesession } from "@/lib/supabase/auth-actions"
 
 const AuthContext = createContext({})
 
-export function AuthProvider({ children}) {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState()
   const [n8nprofile, setN8nprofile] = useState()
   const [profile, setProfile] = useState()
@@ -15,10 +15,10 @@ export function AuthProvider({ children}) {
   const supabase = createClient()
 
   useEffect(() => {
-    const initialize_user = async()=>{
+    const initialize_user = async () => {
       const sess = await fetchactivesession()
       setSession(sess)
-      if (sess?.user){
+      if (sess?.user) {
         setUser(sess?.user)
       }
       //finally set profile
@@ -56,7 +56,7 @@ export function AuthProvider({ children}) {
         }
       }
     })
-   //const sess= await fetchactivesession()
+    //const sess= await fetchactivesession()
 
     setLoading(false)
 
@@ -79,7 +79,7 @@ export function AuthProvider({ children}) {
         data: {
           full_name: fullName,
         },
-        emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
+        emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/flowagent`,
       },
     })
     return { data, error }

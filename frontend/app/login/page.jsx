@@ -30,7 +30,7 @@ export default function LoginPage() {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push("/dashboard")
+      router.push("/flowagent")
     }
   }
 
@@ -104,7 +104,7 @@ export default function LoginPage() {
               Forgot your password?
             </Link>
           </div>
-          
+
         </CardContent>
       </Card>
     </div>

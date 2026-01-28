@@ -32,13 +32,13 @@ export async function middleware(request) {
     } = await supabase.auth.getUser()
 
     // Protect authenticated routes
-    if (request.nextUrl.pathname.startsWith("/dashboard") && !user) {
+    if (request.nextUrl.pathname.startsWith("/flowagent") && !user) {
       return NextResponse.redirect(new URL("/login", request.url))
     }
 
     // Redirect authenticated users away from auth pages
     if ((request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/signup") && user) {
-      return NextResponse.redirect(new URL("/dashboard", request.url))
+      return NextResponse.redirect(new URL("/flowagent", request.url))
     }
 
     return supabaseResponse
