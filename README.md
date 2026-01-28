@@ -23,7 +23,7 @@ You will also need:
 
 ## 🛠️ Quick Setup Guide
 
-## CLONE THE REPO
+### Clone the  repo
 ```bash
 git clone https://github.com/gama2219/flowagent.git
 ```
