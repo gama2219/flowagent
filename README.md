@@ -23,6 +23,11 @@ You will also need:
 
 ## 🛠️ Quick Setup Guide
 
+## CLONE THE REPO
+```bash
+git clone https://github.com/gama2219/flowagent.git
+```
+
 ### 1️⃣ Initialize the Database
 
 > **⚠️ IMPORTANT**
