@@ -1,7 +1,7 @@
 import { APIClient } from "@/lib/api/client"
 
 export class WorkflowService {
-  constructor(n8n_api_key,n8n_url) {
+  constructor(n8n_api_key, n8n_url) {
     this.n8n_api_key = n8n_api_key
     this.n8n_url = n8n_url
     this.client = new APIClient()
@@ -11,7 +11,7 @@ export class WorkflowService {
     try {
       const res = await this.client.post("/api/langgraph/fetch-sessions", {
         n8n_api_key: this.n8n_api_key,
-        n8n_url:this.n8n_url,
+        n8n_url: this.n8n_url,
       })
       return res?.sessions || []
     } catch (error) {
@@ -24,7 +24,7 @@ export class WorkflowService {
     try {
       return await this.client.post("/api/langgraph/create-session", {
         n8n_api_key: this.n8n_api_key,
-        n8n_url:this.n8n_url,
+        n8n_url: this.n8n_url,
         session_name: session_name,
         payload: payload,
       })
@@ -38,7 +38,7 @@ export class WorkflowService {
     try {
       const res = await this.client.post("/api/langgraph/fetch-session", {
         n8n_api_key: this.n8n_api_key,
-        n8n_url:this.n8n_url,
+        n8n_url: this.n8n_url,
         session_name: session_name,
       })
       return res?.session
@@ -52,7 +52,7 @@ export class WorkflowService {
     try {
       const res = await this.client.post("/api/langgraph/chat-message", {
         n8n_api_key: this.n8n_api_key,
-        n8n_url:this.n8n_url,
+        n8n_url: this.n8n_url,
         thread_id: thread_id,
       })
       return res?.messages || []
@@ -66,13 +66,26 @@ export class WorkflowService {
     try {
       const res = await this.client.post("/api/langgraph/chat", {
         n8n_api_key: this.n8n_api_key,
-        n8n_url:this.n8n_url,
+        n8n_url: this.n8n_url,
         message: message,
         thread_id: thread_id,
       })
       return res.output
     } catch (error) {
       console.error("Error invoking chat:", error)
+      throw error
+    }
+  }
+
+  async deleteSession(session_id) {
+    try {
+      return await this.client.post("/api/langgraph/delete-session", {
+        n8n_api_key: this.n8n_api_key,
+        n8n_url: this.n8n_url,
+        session_id: session_id,
+      })
+    } catch (error) {
+      console.error("Error deleting session:", error)
       throw error
     }
   }

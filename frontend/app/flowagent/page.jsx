@@ -13,7 +13,7 @@ import { Workflow, MessageSquare, Sparkles, Plus } from "lucide-react"
 
 export default function DashboardPage() {
   const { user, profile, loading, session } = useAuth()
-  const { workflows, create_session } = useWorkflows()
+  const { workflows, create_session, deleteSession } = useWorkflows()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSessionId, setActiveSessionId] = useState(null)
   const [activeSession, setActiveSession] = useState(null)
@@ -72,6 +72,18 @@ export default function DashboardPage() {
     }
   }
 
+  const handleDeleteSession = async (sessionId) => {
+    try {
+      await deleteSession(sessionId)
+      if (activeSessionId === sessionId) {
+        setActiveSessionId(null)
+        setActiveSession(null)
+      }
+    } catch (error) {
+      console.error("Error deleting session:", error)
+    }
+  }
+
   const handleSessionSelect = (sessionId) => {
     const workflow = workflows.find((s) => s.thread_id === sessionId)
     setActiveSessionId(sessionId)
@@ -81,16 +93,17 @@ export default function DashboardPage() {
   return (
     <div className="h-screen flex bg-background overflow-hidden">
       {/* Sidebar - fixed height */}
-      <div className="flex-shrink-0 h-screen overflow-hidden">
-        <Sidebar
-          sessions={workflows}
-          activeSessionId={activeSessionId}
-          onSessionSelect={handleSessionSelect}
-          onNewSession={handleNewSession}
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
-      </div>
+      {/* Sidebar - fixed height */}
+      <Sidebar
+        className="flex-shrink-0 relative z-20"
+        sessions={workflows}
+        activeSessionId={activeSessionId}
+        onSessionSelect={handleSessionSelect}
+        onNewSession={handleNewSession}
+        onDeleteSession={handleDeleteSession}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
