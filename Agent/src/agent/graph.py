@@ -5,6 +5,8 @@ from src.agent.supervisor_agent import create_supervisor_agent
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
+from deepagents import create_deep_agent
+from deepagents import CompiledSubAgent
 import os
 
 agent_name=os.getenv('agent_name')
@@ -28,14 +30,18 @@ model = init_chat_model(
 
 #agents
 agent_n8n =create_agent(model=model,name='n8n_agent',system_prompt=prompt_n8n_agent.text,tools=tools)
+agent_n8n_= CompiledSubAgent(
+    name="n8n_agent",
+    description="n8n specialist",
+    runnable=agent_n8n 
+)
 
 
-
-graph=create_supervisor_agent(
+graph =create_deep_agent(
     model=model,
-    agents=[agent_n8n],
-    prompt=the_main_agent.text,
+    system_prompt=the_main_agent.text,
     tools=[web_search_tool,workflow_examples],
-    supervisor_name=agent_name,
-    add_handoff_back_messages=True
-).compile()
+    subagents=[agent_n8n_],
+    name=agent_name,
+)
+

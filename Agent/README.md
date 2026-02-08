@@ -4,7 +4,7 @@ The Agent  handles the creation and updating of n8n workflows through conversati
 
 ## 🧠 How it Works
 
-The agent uses a **Supervisor Architecture (via LangGraph)** :
+The agent uses a **Deep agent Architecture (via LangGraph)** :
 
 1. **Context Retrieval**: It searches a ChromaDB vector database to find existing workflow patterns that match the user's request.
 2. **n8n Interaction**: A specialized sub-agent connects to your n8n instance to push updates or create new nodes.
