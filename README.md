@@ -64,17 +64,17 @@ Build and start the application using your preferred tool:
 
 **Using Docker:**
 ```bash
-docker compose up
+docker compose up -d
 ```
 **Using Podman :**
 
 ```bash
-podman-compose up 
+podman-compose up -d
 ```
 
 The application will be available at http://localhost:3000.
 
-To stop and remove containers: Press Ctrl + C to stop the process, then run:
+To stop and remove containers:
 
     Docker: docker compose down
 

@@ -15,6 +15,7 @@ import { ErrorToast } from "./error-toast"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import rehypeSanitize from "rehype-sanitize"
+import { useStream } from "@langchain/langgraph-sdk/react";
 
 export function ChatInterface({ sessionId, sessionName, workflowName }) {
   const [input, setInput] = useState("")
@@ -25,6 +26,7 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
   const scrollAreaRef = useRef(null)
   const textareaRef = useRef(null)
   const workflowService = new WorkflowService(profile?.n8n_key,profile?.n8n_endpoint)
+  
 
   useEffect(() => {
     if (scrollAreaRef.current) {
