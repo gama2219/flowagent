@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/hooks/use-auth"
 import { useWorkflows } from "@/hooks/use-workflows"
 import { N8nKeySetup } from "@/components/n8n-key-setup"
@@ -18,9 +18,14 @@ export default function DashboardPage() {
   const [activeSessionId, setActiveSessionId] = useState(null)
   const [activeSession, setActiveSession] = useState(null)
   const [showWorkflowSelector, setShowWorkflowSelector] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // Show loading state
-  if (loading) {
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Show loading state or prevent hydration mismatch
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

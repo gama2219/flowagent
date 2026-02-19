@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse } from "next/server"
 
-export async function middleware(request) {
+export async function proxy(request) {
   try {
     let supabaseResponse = NextResponse.next({
       request,
@@ -30,6 +30,13 @@ export async function middleware(request) {
     const {
       data: { user },
     } = await supabase.auth.getUser()
+    
+    if (request.nextUrl.pathname.startsWith('/langgraph')){
+    const { data, error } = await supabase.auth.getSession()
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('Authorization', `Bearer ${data.session?.access_token}`);
+    return NextResponse.next({request: {headers: requestHeaders,},});
+    }
 
     // Protect authenticated routes
     if (request.nextUrl.pathname.startsWith("/flowagent") && !user) {
@@ -47,6 +54,7 @@ export async function middleware(request) {
     // Return next response on error to prevent blocking
     return NextResponse.next()
   }
+
 }
 
 export const config = {

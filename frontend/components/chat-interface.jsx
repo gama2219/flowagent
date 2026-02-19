@@ -16,6 +16,9 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import rehypeSanitize from "rehype-sanitize"
 import { useStream } from "@langchain/langgraph-sdk/react";
+import { Client } from "@langchain/langgraph-sdk";
+
+const agent_endpoint = process.env.LANGGRAPH_SERVER_URL
 
 export function ChatInterface({ sessionId, sessionName, workflowName }) {
   const [input, setInput] = useState("")
@@ -25,8 +28,32 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
   const { messages, loading: loadingMessages, addMessage, addLocalMessage } = useMessages(sessionId)
   const scrollAreaRef = useRef(null)
   const textareaRef = useRef(null)
-  const workflowService = new WorkflowService(profile?.n8n_key,profile?.n8n_endpoint)
-  
+  const workflowService = new WorkflowService(profile?.n8n_key, profile?.n8n_endpoint)
+
+  const client = new Client({
+    apiUrl: "http://localhost:3000/langgraph",
+    defaultHeaders: {
+      "X-N8N-API-KEY": profile?.n8n_key,
+      "X-N8N-ENDPOINT": profile?.n8n_endpoint,
+    }
+  });
+  const stream = useStream({ client, threadId: sessionId })
+
+
+
+  /* if (stream.messages) {
+       console.log(stream.messages)
+     } else if (stream.error) {
+       console.log(stream.error)
+     } else if (stream.isloading) {
+       console.log("loading")
+     }else{
+       console.log('nothing')
+       
+     }*/
+
+
+
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -142,14 +169,14 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
                   )}
                 >
                   <div className="text-sm leading-relaxed">
-                  <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeSanitize]}
-                  className = "whitespace-pre-wrap break-words"
-                  >
-                    {Array.isArray(message.content) ? message.content[0]?.text : message.content}
-                  </ReactMarkdown>
-                    
+                    <div className="whitespace-pre-wrap break-words">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeSanitize]}
+                      >
+                        {Array.isArray(message.content) ? message.content[0]?.text : message.content}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 </Card>
 

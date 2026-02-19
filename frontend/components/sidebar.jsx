@@ -82,7 +82,7 @@ export function Sidebar({
                 <>
                   <div className="flex-1 min-w-0 flex flex-col items-start gap-0.5">
                     <span className="truncate w-full text-sm font-medium block text-left">
-                      {session.metadata.thread_name || "New Workflow"}
+                      {session.metadata.thread_name.length > 20 ? `${session.metadata.thread_name.substr(0, 12)}....` : session.metadata.thread_name || "New Workflow"}
                     </span>
                     <span className="truncate w-full text-[11px] opacity-60 block text-left">
                       {new Date().toLocaleDateString()}
