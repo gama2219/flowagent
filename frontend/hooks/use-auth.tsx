@@ -3,27 +3,48 @@
 import { useState, useEffect, createContext, useContext } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { serverSignOut, serverFetchProfile, serverUpdateProfile, fetchactivesession } from "@/lib/supabase/auth-actions"
+import { User, Session, AuthChangeEvent } from "@supabase/supabase-js"
 
-const AuthContext = createContext({})
+export interface Profile {
+  id: string
+  full_name?: string
+  avatar_url?: string
+  email?: string
+  [key: string]: any
+}
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState()
-  const [n8nprofile, setN8nprofile] = useState()
-  const [profile, setProfile] = useState()
+export interface AuthContextType {
+  user: User | null | undefined
+  profile: Profile | null | undefined
+  loading: boolean
+  n8nprofile: any
+  supabase: ReturnType<typeof createClient>
+  session: Session | null | undefined
+  signIn: (email: string, password: string) => Promise<{ data: any; error: any }>
+  signUp: (email: string, password: string, fullName: string) => Promise<{ data: any; error: any }>
+  signOut: () => Promise<{ success?: boolean; error?: string }>
+  updateProfile: (updates: any) => Promise<{ data: any; error: any }>
+  fetchProfile: (userId: string) => Promise<{ data: any; error: any }>
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null | undefined>()
+  const [n8nprofile, setN8nprofile] = useState<any>()
+  const [profile, setProfile] = useState<Profile | null | undefined>()
   const [loading, setLoading] = useState(true)
-  const [session, setSession] = useState()
+  const [session, setSession] = useState<Session | null | undefined>()
   const supabase = createClient()
 
   useEffect(() => {
     const initialize_user = async () => {
-      const sess = await fetchactivesession()
+      const sess = await fetchactivesession() as Session | null
       setSession(sess)
       if (sess?.user) {
         setUser(sess?.user)
+        fetchProfile(sess.user.id)
       }
-      //finally set profile
-      fetchProfile(user?.id)
-
     }
 
     initialize_user()
@@ -46,24 +67,23 @@ export function AuthProvider({ children }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       setUser(session?.user)
 
       if (session?.user) {
         const { data } = await serverFetchProfile(session.user.id)
         if (data) {
-          setProfile(data)
+          setProfile(data as Profile)
         }
       }
     })
-    //const sess= await fetchactivesession()
 
     setLoading(false)
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [supabase.auth])
 
-  const signIn = async (email, password) => {
+  const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -71,7 +91,7 @@ export function AuthProvider({ children }) {
     return { data, error }
   }
 
-  const signUp = async (email, password, fullName) => {
+  const signUp = async (email: string, password: string, fullName: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -91,29 +111,29 @@ export function AuthProvider({ children }) {
       setUser(null)
       setProfile(null)
     }
-    return result
+    return result as { success?: boolean; error?: string }
   }
 
-  const updateProfile = async (updates) => {
-    if (!user) return { error: "No user logged in", data: null }
+  const updateProfile = async (updates: any) => {
+    const userId = user?.id || (user as any)?.sub
+    if (!userId) return { error: "No user logged in", data: null }
 
-    const result = await serverUpdateProfile(user.id || user?.sub, updates)
-    console.log(result)
+    const result = await serverUpdateProfile(userId, updates)
     if (!result.error && result.data) {
-      setProfile(result.data)
+      setProfile(result.data as Profile)
     }
     return result
   }
 
-  const fetchProfile = async (userId) => {
+  const fetchProfile = async (userId: string) => {
     const result = await serverFetchProfile(userId)
     if (!result.error && result.data) {
-      setProfile(result.data)
+      setProfile(result.data as Profile)
     }
     return result
   }
 
-  const value = {
+  const value: AuthContextType = {
     user,
     profile,
     loading,

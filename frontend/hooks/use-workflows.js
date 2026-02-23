@@ -57,7 +57,7 @@ export function useWorkflows() {
   const deleteSession = async (session_id) => {
     try {
       const deletedWorkflow = await workflowService.deleteSession(session_id)
-      setWorkflows((prev) => prev.filter((workflow) => workflow.thread_id !== deletedWorkflow.session_id))
+      setWorkflows((prev) => prev.filter((workflow) => workflow.thread_id !== deletedWorkflow))
       return deletedWorkflow
     } catch (err) {
       console.error("Error deleting workflow:", err)

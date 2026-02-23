@@ -5,7 +5,7 @@ import { AuthProvider } from "@/hooks/use-auth"
 import { NetworkErrorAlert } from "@/components/network-error-alert"
 import "./globals.css"
 import { Suspense } from "react"
-import { createClient } from "@/lib/supabase/server"
+// import { createClient } from "@/lib/supabase/server"
 
 export const metadata = {
   title: "AI Workflow Builder - Create n8n Workflows with AI",
