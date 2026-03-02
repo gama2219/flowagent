@@ -3,7 +3,7 @@ import { Client } from "@langchain/langgraph-sdk"
 export class WorkflowService {
   constructor(n8n_api_key, n8n_url) {
     this.client = new Client({
-      apiUrl: "http://localhost:3000/langgraph",
+      apiUrl: `${window.location.origin}/langgraph`,
       defaultHeaders: {
         "X-N8N-API-KEY": n8n_api_key,
         "X-N8N-ENDPOINT": n8n_url,
