@@ -12,13 +12,13 @@ prompt_template_n8n_agent = PromptTemplate.from_template("""
                                                          1.'workflow_creator':
                                                          Function: Creates a new n8n workflow.
                                                          When to use: Employ this tool when the user explicitly requests to create a brand new workflow.
-                                                         Arguments: Requires the complete n8n workflow as a sanitized JSON object.
+                                                         Arguments: Requires the complete n8n workflow as a dict object.
                                                          Returns: A dictionary indicating the HTTP status (200 for success) and the ID of the newly created workflow, or an error status and reason on failure.
                                                          
                                                          2.'update_wokflow':
                                                          Function: Updates an existing n8n workflow.
                                                          When to use: When the user wants to modify an existing workflow. You must have the workflow's ID and the complete updated JSON structure. If you only have the ID, you must first use fetch_workflow to retrieve the current JSON, apply the requested changes, and then use this tool to submit the update.
-                                                         Arguments: Requires the workflow's ID (string) and the complete updated n8n workflow as a sanitized JSON object.
+                                                         Arguments: Requires the workflow's ID (string) and the complete updated n8n workflow as a dict object.
                                                          Returns: A dictionary indicating the HTTP status (200 for success) and the ID of the updated workflow, or an error status and reason on failure.
                                                          
                                                          3.'fetch_workflow':
@@ -147,7 +147,7 @@ Iterate & Support: Be prepared for follow-up questions. Always maintain a helpfu
 
 Communication Style
 Empathetic & Collaborative: Acknowledge challenges and celebrate successes.
-Clear & Concise: Provide information directly and briefly. Use summarization as the default for complex outputs like workflow JSON.
+Clear & Concise: Provide information directly and briefly. Use summarization as the default for complex outputs like workflow JSON.Never ever return raw json to the user just summarize the thing.
 Thorough Information Gathering: Always ensure you have all necessary details, especially for external integrations, before attempting to generate or modify workflow JSON.
 Action-Oriented: Guide the user towards solutions and next steps.
 Your goal is to be the ultimate n8n co-pilot for developers, making their work smoother and more efficient.
@@ -161,13 +161,13 @@ the_main_agent=main_agent.invoke({'name':agent_name})
 #tools desctiption
 workflow_creator_description=("""
                               Creates a new n8n workflow.
-                              Args: workflow (str): The complete n8n workflow str  json  object  to be created.
+                              Args: workflow (dict): The complete n8n workflow dict object  to be created.
                               Returns:dict: A dictionary containing the HTTP status code (200) and the ID of the new workflow on success, or an error status code and reason on failure.
                               """)
 
 
 update_wokflow_description=("""Updates an existing n8n workflow.
-                            Args:workflow (str): The complete n8n workflow  string JSON object for the update  and  id (str): The ID of the workflow to update.
+                            Args:workflow (dict): The complete n8n workflow  dict object for the update  and  id (str): The ID of the workflow to update.
                             Returns:dict: A dictionary containing the HTTP status code (200) and the ID of the updated workflow on success, or an error status code and reason on failure.""")
 
 fetch_workflow_description=("""

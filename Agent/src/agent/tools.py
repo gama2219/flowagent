@@ -27,18 +27,16 @@ request_handler=n8n_request_handler()
 
 
 class argschema (BaseModel):
-    workflow:str=Field(description='The complete n8n workflow str json  object to be created ')
+    workflow:dict=Field(description='The complete n8n workflow dict object to be created ')
 
 @tool(description=workflow_creator_description,args_schema=argschema)
-async def workflow_creator(workflow:str)->dict:
+async def workflow_creator(workflow:dict)->dict:
     config=get_config()
     n8n_id = config["configurable"].get("langgraph_auth_user").get('n8n_id')
     n8n_endpoint= config["configurable"].get("langgraph_auth_user").get('n8n_endpoint')
 
     try:
-        dict_workflow = json.loads(workflow)
-
-        response=await asyncio.to_thread(request_handler.createWorkflow,dict_workflow,n8n_id,n8n_endpoint)
+        response=await asyncio.to_thread(request_handler.createWorkflow,workflow,n8n_id,n8n_endpoint)
         if response.status_code==200:
             tool_response={
                 'status':200,
@@ -80,14 +78,12 @@ async def fetch_workflow(id:str)->dict:
 
 
 @tool(description=update_wokflow_description)
-async def update_wokflow(workflow:str,id:str)->dict:
+async def update_wokflow(workflow:dict,id:str)->dict:
     config=get_config()
     n8n_id = config["configurable"].get("langgraph_auth_user").get('n8n_id')
     n8n_endpoint= config["configurable"].get("langgraph_auth_user").get('n8n_endpoint')
 
-    dict_workflow = json.loads(workflow)
-
-    response=await asyncio.to_thread(request_handler.updateWorkflow ,id,dict_workflow,n8n_id,n8n_endpoint)
+    response=await asyncio.to_thread(request_handler.updateWorkflow ,id,workflow,n8n_id,n8n_endpoint)
 
     if response.status_code==200:
         tool_response={
