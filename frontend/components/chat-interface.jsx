@@ -13,6 +13,7 @@ import { ErrorToast } from "./error-toast"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import rehypeSanitize from "rehype-sanitize"
+import "../styles/markdown-styles.css"
 import { useStream } from "@langchain/langgraph-sdk/react";
 import { Client } from "@langchain/langgraph-sdk";
 
@@ -66,7 +67,7 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
     }
 
   }, [isLoading, toolCalls])
-  
+
 
 
   const displayMessages = useMemo(() => {
@@ -172,41 +173,55 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
             {displayMessages.map((message, index) => (
               <div
                 key={message.id || index}
-                className={cn("flex gap-3", message.type === "human" ? "justify-end" : "justify-start")}
+                className={cn(
+                  "flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-3 duration-300",
+                  message.type === "human" ? "items-end" : "items-start"
+                )}
               >
-                {message.type !== "human" && (
-                  <Avatar className="h-8 w-8 bg-primary/10 flex-shrink-0">
+                <div className={cn("flex gap-3 max-w-[90%]", message.type === "human" ? "flex-row-reverse" : "flex-row")}>
+                  <Avatar className={cn(
+                    "h-8 w-8 flex-shrink-0 mt-1 ring-2 ring-background",
+                    message.type === "human" ? "bg-secondary" : "bg-primary/20"
+                  )}>
                     <AvatarFallback>
-                      <Bot className="h-4 w-4 text-primary" />
+                      {message.type === "human" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4 text-primary" />}
                     </AvatarFallback>
                   </Avatar>
-                )}
 
-                <Card
-                  className={cn(
-                    "max-w-[80%] p-4",
-                    message.type === "human" ? "bg-primary text-primary-foreground" : "bg-card",
-                  )}
-                >
-                  <div className="text-sm leading-relaxed">
-                    <div className="whitespace-pre-wrap break-words">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        rehypePlugins={[rehypeSanitize]}
-                      >
-                        {Array.isArray(message.content) ? message.content[0]?.text : message.content}
-                      </ReactMarkdown>
+                  <div className="flex flex-col gap-1">
+                    <div className={cn(
+                      "flex items-center gap-2 mb-1 px-1",
+                      message.type === "human" ? "justify-end" : "justify-start"
+                    )}>
+                      <span className="text-xs font-semibold text-muted-foreground/80 lowercase tracking-tight">
+                        {message.type === "human" ? (user?.email?.split('@')[0] || "You") : "FlowAgent"}
+                      </span>
                     </div>
-                  </div>
-                </Card>
 
-                {message.type === "human" && (
-                  <Avatar className="h-8 w-8 bg-secondary flex-shrink-0">
-                    <AvatarFallback>
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                )}
+                    <Card
+                      className={cn(
+                        "p-4 shadow-sm transition-all duration-200",
+                        message.type === "human"
+                          ? "bg-primary text-primary-foreground border-primary rounded-2xl rounded-tr-sm"
+                          : "bg-card border-border/50 rounded-2xl rounded-tl-sm hover:border-primary/20"
+                      )}
+                    >
+                      <div className={cn(
+                        "text-sm leading-relaxed",
+                        message.type !== "human" && "prose-chat-ai"
+                      )}>
+                        <div className="whitespace-pre-wrap break-words">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeSanitize]}
+                          >
+                            {Array.isArray(message.content) ? message.content[0]?.text : message.content}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
               </div>
             ))}
 

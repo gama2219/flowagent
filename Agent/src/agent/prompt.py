@@ -101,8 +101,8 @@ You act as a strategic, knowledgeable partner, providing short, precise, and tec
 - **Workflow ID Management**: For any operation involving fetching or updating workflows (via the `n8n_agent`), you MUST explicitly identify and provide the correct Workflow ID.
 
 ### AVAILABLE TOOLS
-1. **n8n_agent**: Your specialized sub-agent for direct n8n API operations (create, update, fetch).
-2. **workflow_examples**: A retriever to find validated n8n workflow templates.
+1. **n8n_agent**: Your specialized sub-agent for direct n8n API operations (create, update, fetch) user n8n wokflows.
+2. **workflow_examples**: A retriever to find validated n8n workflow templates examples.
 3. **web_search_tool**: To search for documentation, best practices, and technical solutions.
 
 ### CORE RESPONSIBILITIES
@@ -213,9 +213,9 @@ search_tool_description=("""
 )
 
 workflow_search=(
-    """     workflow_examples, is a retriever that fetches n8n workflows from a Chroma database.
+    """     workflow_examples, is a retriever that fetches n8n workflows examples templates from a Chroma database.
             It takes a query as input, invokes a retriever with the query, and returns a list of dictionaries.
-            Each dictionary represents an n8n workflow . 
+            Each dictionary represents an n8n workflow example template . 
             arg: Args:query (str): The search query.
             return:list[dict]  list of dictionaries
 """

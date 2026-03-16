@@ -1,0 +1,85 @@
+
+/* Markdown Styles for Chat Interface */
+.prose-chat-ai {
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.prose-chat-ai table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  display: block;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.prose-chat-ai th,
+.prose-chat-ai td {
+  padding: 0.75rem;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+.prose-chat-ai th {
+  background-color: var(--muted);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.prose-chat-ai td {
+  font-size: 0.875rem;
+}
+
+.prose-chat-ai code {
+  background-color: var(--muted);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+  font-family: var(--font-mono);
+}
+
+.prose-chat-ai pre {
+  background-color: var(--muted);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.prose-chat-ai pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.prose-chat-ai ul,
+.prose-chat-ai ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.prose-chat-ai li {
+  margin-bottom: 0.5rem;
+}
+
+.prose-chat-ai h1,
+.prose-chat-ai h2,
+.prose-chat-ai h3,
+.prose-chat-ai h4 {
+  margin: 1.5rem 0 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.prose-chat-ai h1 { font-size: 1.5rem; }
+.prose-chat-ai h2 { font-size: 1.25rem; }
+.prose-chat-ai h3 { font-size: 1.125rem; }
+
+.prose-chat-ai > *:first-child {
+  margin-top: 0;
+}
+
+.prose-chat-ai > *:last-child {
+  margin-bottom: 0;
+}
