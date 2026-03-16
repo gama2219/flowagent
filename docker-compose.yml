@@ -9,8 +9,6 @@ services:
     network_mode: "host"
     volumes:
       - langraph_data:/app/.langgraph_api 
-    networks:
-      - langgraph-net
 
   frontend:
     build:
@@ -22,8 +20,6 @@ services:
     network_mode: "host"
     depends_on:
       - langgraph-api
-    networks:
-      - langgraph-net
 
 volumes:
   langraph_data:
