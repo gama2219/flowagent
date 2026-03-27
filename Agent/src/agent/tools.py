@@ -15,12 +15,6 @@ import os
 import json
 
 
-google_api_key=os.getenv('GOOGLE_API_KEY')
-
-
-
-embeddings=GoogleGenerativeAIEmbeddings(model='models/gemini-embedding-001',google_api_key=google_api_key)
-
 
 
 request_handler=n8n_request_handler()
@@ -116,18 +110,29 @@ async def web_search_tool(query:str)->str:
     response=await search.ainvoke({'query':query})
     return response.get('answer')
 
-
+#fetching examples from n8n community workflows
 @tool(description=workflow_search)
 async def workflow_examples(query:str)->list[dict]:
-    vector_store = Chroma(collection_name='n8n_workflow',embedding_function=embeddings,persist_directory="./chroma_db",create_collection_if_not_exists=False)
-    retriever = vector_store.as_retriever(
-    search_type="mmr",
-    search_kwargs={"k": 7, "fetch_k": 10, "lambda_mult": 0.5},
-    )
+    url = f'https://api.n8n.io/templates/search?search={query}&rows=15&page=1'
+    out_put=[]
 
-    response=await retriever.ainvoke(query)
-    out_put=[ json.loads( i.metadata.get('original_json')) for i in response ]
+    res = request('GET',url)
+    if res.ok:
+        workflows_res= res.json().get("workflows")
+        filterd_workflows=[x['id'] for x in workflows_res if x.get('price')==0]
 
+        for i in filterd_workflows:
+            url_ =f'https://api.n8n.io/workflows/templates/{i}'
+            flow = request('GET',url_)
+
+            if flow.ok:
+                workflow = flow.json().get("workflow")
+                out_put.append(workflow)
+            else:
+                raise Exception(f"Error fetching workflow {i}: {flow.reason}")   
+    else:
+        raise Exception(f"Error fetching workflows: {res.reason}")
+    
     return out_put
 
 

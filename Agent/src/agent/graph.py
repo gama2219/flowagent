@@ -1,7 +1,6 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from src.agent.tools import workflow_examples,web_search_tool,tools
 from src.agent.prompt import the_main_agent,prompt_template_n8n_agent
-from src.agent.supervisor_agent import create_supervisor_agent
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model

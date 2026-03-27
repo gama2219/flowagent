@@ -48,14 +48,12 @@ git clone https://github.com/gama2219/flowagent.git
    cp .env.example .env
    ```
 
-Open `.env` and fill in the following variables:
+2. Open `.env` and fill in the necessary variables. Ensure you:
+   - **Mandatory Integrations**: Provide `TAVILY_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+   - **Model Selection**: Choose your preferred model provider (Google Gemini, OpenAI, Anthropic, etc.), uncomment the corresponding `model` line, and provide the required API key (e.g., `GOOGLE_API_KEY`).
+   - **Observability (Optional)**: Provide `LANGSMITH_API_KEY` if you wish to use LangSmith for tracing.
+   - **Defaults**: `agent_name`, `NEXT_PUBLIC_APP_URL`, and `LANGGRAPH_SERVER_URL` are pre-configured for local development but can be adjusted if needed.
 
-**LANGSMITH_API_KEY** - Your LangSmith API key for debugging  
-**GOOGLE_API_KEY** - Your Google Gemini API Key  
-**TAVILY_API_KEY** - Required for real-time node research  
-**NEXT_PUBLIC_SUPABASE_URL** - Your Supabase project URL (Local or Cloud)  
-**NEXT_PUBLIC_SUPABASE_ANON_KEY** - Your Supabase Anon/Public key  
-**agent_name** - Default is `flowagent`  
 
 ## 3️⃣ Launch the Agent
 

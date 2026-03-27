@@ -9,7 +9,5 @@ COPY . .
 
 RUN pip install -e .
 
-RUN python v_db2.py
-
 
 ENTRYPOINT  ["langgraph", "dev","--allow-blocking","--no-browser"]

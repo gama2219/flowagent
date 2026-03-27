@@ -213,7 +213,7 @@ search_tool_description=("""
 )
 
 workflow_search=(
-    """     workflow_examples, is a retriever that fetches n8n workflows examples templates from a Chroma database.
+    """     workflow_examples, is a retriever that fetches n8n workflows examples templates from n8n community templates.
             It takes a query as input, invokes a retriever with the query, and returns a list of dictionaries.
             Each dictionary represents an n8n workflow example template . 
             arg: Args:query (str): The search query.
