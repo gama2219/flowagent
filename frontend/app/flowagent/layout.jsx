@@ -6,11 +6,12 @@ import { WorkflowProvider, useWorkflowContext } from "@/components/workflow-prov
 import { WorkflowSelector } from "@/components/workflow-selector"
 import { useAuth } from "@/hooks/use-auth"
 import { N8nKeySetup } from "@/components/n8n-key-setup"
-import { useRouter, useParams } from "next/navigation"
+import { useRouter, useParams, usePathname } from "next/navigation"
+
 import { Workflow } from "lucide-react"
 
 function FlowagentLayoutContent({ children }) {
-    const { profile, loading } = useAuth()
+    const { profile, loading, n8nvalid } = useAuth()
     const { workflows, create_session, deleteSession } = useWorkflowContext()
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
     const [showWorkflowSelector, setShowWorkflowSelector] = useState(false)
@@ -18,6 +19,9 @@ function FlowagentLayoutContent({ children }) {
     const router = useRouter()
     const params = useParams()
     const activeSessionId = params.sessionId
+    const pathname = usePathname()
+
+
 
     useEffect(() => {
         setMounted(true)
@@ -26,6 +30,12 @@ function FlowagentLayoutContent({ children }) {
         window.addEventListener('open-workflow-selector', handleOpenSelector)
         return () => window.removeEventListener('open-workflow-selector', handleOpenSelector)
     }, [])
+
+    useEffect(() => {
+        if (mounted && !loading && !n8nvalid && !pathname.includes('/setup')) {
+            router.push("/flowagent/setup")
+        }
+    }, [mounted, loading, n8nvalid, pathname, router])
 
     if (!mounted || loading) {
         return (
@@ -38,9 +48,18 @@ function FlowagentLayoutContent({ children }) {
         )
     }
 
-    if (!profile?.n8n_key) {
-        return <N8nKeySetup onComplete={() => window.location.reload()} />
+    if (pathname.includes('/setup')) {
+        return (
+            <main className="flex-1 flex flex-col overflow-hidden relative">
+                {children}
+            </main>
+        )
     }
+
+    if (!n8nvalid) {
+        return null // Redirect will be handled by useEffect
+    }
+
 
     const handleNewSession = () => {
         setShowWorkflowSelector(true)

@@ -20,6 +20,7 @@ export interface AuthContextType {
   n8nprofile: any
   supabase: ReturnType<typeof createClient>
   session: Session | null | undefined
+  n8nvalid: boolean
   signIn: (email: string, password: string) => Promise<{ data: any; error: any }>
   signUp: (email: string, password: string, fullName: string) => Promise<{ data: any; error: any }>
   signOut: () => Promise<{ success?: boolean; error?: string }>
@@ -35,50 +36,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null | undefined>()
   const [loading, setLoading] = useState(true)
   const [session, setSession] = useState<Session | null | undefined>()
+  const [n8nvalid, setvalidity] = useState<boolean>(false)
   const supabase = createClient()
 
   useEffect(() => {
-    const initialize_user = async () => {
-      const sess = await fetchactivesession() as Session | null
-      setSession(sess)
-      if (sess?.user) {
-        setUser(sess?.user)
-        fetchProfile(sess.user.id)
-      }
-    }
-
-    initialize_user()
-
-    const get_user_n8n = async () => {
+    const initialize = async () => {
+      setLoading(true)
       try {
-        const response = await fetch("/api/n8n/get-user", {
-          method: "GET",
-        })
-        if (response.ok) {
-          const result = await response.json()
-          setN8nprofile(result)
+        // 1. Initial Session Check
+        const sess = await fetchactivesession() as Session | null
+        setSession(sess)
+
+        if (sess?.user) {
+          setUser(sess?.user)
+          // 2. Fetch Profile and wait for it
+          const profileResult = await serverFetchProfile(sess.user.id)
+          if (profileResult.data) {
+            const currentProfile = profileResult.data as Profile
+            setProfile(currentProfile)
+
+            // 3. Check n8n validity only if profile exists
+            if (currentProfile.n8n_key && currentProfile.n8n_endpoint) {
+              try {
+                const response = await fetch("/api/n8n/test-connection", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    instanceUrl: currentProfile.n8n_endpoint,
+                    apiKey: currentProfile.n8n_key,
+                  }),
+                })
+                if (response.ok) {
+                  setvalidity(true)
+                }
+              } catch (error) {
+                console.error("Error checking n8n validity:", error)
+              }
+            }
+          }
         }
+
+        // 4. Fetch n8n profile (non-critical, can be concurrent)
+        fetch("/api/n8n/get-user", { method: "GET" })
+          .then(res => res.ok ? res.json() : null)
+          .then(result => { if (result) setN8nprofile(result) })
+          .catch(err => console.error("Error fetching n8n profile:", err))
+
       } catch (error) {
-        console.error("Error fetching n8n profile:", error)
+        console.error("Initialization error:", error)
+      } finally {
+        setLoading(false)
       }
     }
 
-    get_user_n8n()
+    initialize()
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       setUser(session?.user)
-
       if (session?.user) {
         const { data } = await serverFetchProfile(session.user.id)
         if (data) {
           setProfile(data as Profile)
         }
+      } else {
+        setProfile(null)
+        setvalidity(false)
       }
     })
-
-    setLoading(false)
 
     return () => subscription.unsubscribe()
   }, [supabase.auth])
@@ -140,6 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     n8nprofile,
     supabase,
     session,
+    n8nvalid,
     signIn,
     signUp,
     signOut,
