@@ -119,21 +119,22 @@ async def workflow_examples(query:str)->list[dict]:
     res = request('GET',url)
     if res.ok:
         workflows_res= res.json().get("workflows")
-        filterd_workflows=[x['id'] for x in workflows_res if x.get('price')==0]
+        filterd_workflows=[(x['id'],x.get('description')) for x in workflows_res if x.get('price')==0]
 
-        for i in filterd_workflows:
+        for i,z in filterd_workflows:
             url_ =f'https://api.n8n.io/workflows/templates/{i}'
             flow = request('GET',url_)
 
             if flow.ok:
                 workflow = flow.json().get("workflow")
-                out_put.append(workflow)
+                result_={'description':z,'workflow':workflow}
+                out_put.append(result_)
             else:
                 raise Exception(f"Error fetching workflow {i}: {flow.reason}")   
     else:
         raise Exception(f"Error fetching workflows: {res.reason}")
     
-    return out_put
+    return out_put if len(out_put)>0 else ["no result found for this query try to search the query in a different way"]
 
 
 tools=[workflow_creator,update_wokflow,fetch_workflow,web_search_tool,workflow_examples]
