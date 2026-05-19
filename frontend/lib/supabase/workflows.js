@@ -79,4 +79,23 @@ export class WorkflowService {
       throw error
     }
   }
+
+  async updatethreadmetadata(sessionid, workflow_name) {
+    try {
+      const upres = await this.client.threads.update(
+        sessionid,
+        {
+          metadata: {
+            thread_name: workflow_name
+          }
+        }
+      )
+
+      return upres
+    }
+    catch (error) {
+      console.error("Error updating thread metadata:", error)
+      throw error
+    }
+  }
 }

@@ -16,6 +16,7 @@ import rehypeSanitize from "rehype-sanitize"
 import "../styles/markdown-styles.css"
 import { useStream } from "@langchain/langgraph-sdk/react";
 import { Client } from "@langchain/langgraph-sdk";
+import { useWorkflows } from "@/hooks/use-workflows"
 
 export function ChatInterface({ sessionId, sessionName, workflowName }) {
   const [input, setInput] = useState("")
@@ -24,6 +25,7 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
   const scrollAreaRef = useRef(null)
   const textareaRef = useRef(null)
   const [loadingText, setLoadingText] = useState("Thinking...")
+  const { update_thread_metadata } = useWorkflows()
 
 
 
@@ -107,6 +109,12 @@ export function ChatInterface({ sessionId, sessionName, workflowName }) {
     e.preventDefault();
     const messageContent = input.trim();
     if (!messageContent || isLoading) return;
+
+    if (sessionName === 'untitled') {
+      let sess_name = messageContent.substring(0, 10)
+
+      await update_thread_metadata(sessionId, sess_name)
+    }
 
     setInput("");
 

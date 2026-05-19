@@ -27,12 +27,12 @@ export function WorkflowSelector({ onSelect, onCancel }) {
   const loadN8nWorkflows = async () => {
     setLoadingN8n(true)
     try {
-      const response = await fetch("/api/n8n/workflows",{
-        method:'GET',
+      const response = await fetch("/api/n8n/workflows", {
+        method: 'GET',
       })
       if (response.ok) {
         const data = await response.json()
-        setN8nWorkflows(data.workflows.filter(element=>!element.isArchived) || [])
+        setN8nWorkflows(data.workflows.filter(element => !element.isArchived) || [])
       } else {
         console.error("Failed to load n8n workflows")
       }
@@ -72,7 +72,7 @@ export function WorkflowSelector({ onSelect, onCancel }) {
     }
   }
 
-  const canSubmit = (mode === "existing" && selectedWorkflow) || (mode === "new" && newWorkflowName.trim())
+  const canSubmit = mode === "existing" && selectedWorkflow
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -156,17 +156,19 @@ export function WorkflowSelector({ onSelect, onCancel }) {
           )}
 
           {mode === "new" && (
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="workflowName">New Session Name</Label>
-                <Input
-                  id="workflowName"
-                  placeholder="Enter workflow name..."
-                  value={newWorkflowName}
-                  onChange={(e) => setNewWorkflowName(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
+            <div className="space-y-4 flex flex-col items-center justify-center py-6">
+              <Button
+                onClick={() => {
+                  onSelect({
+                    type: "new",
+                    workflowName: "untitled",
+                  })
+                }}
+                className="w-full py-6 text-base flex items-center justify-center gap-2"
+              >
+                <Plus className="h-5 w-5" />
+                Create New Session
+              </Button>
             </div>
           )}
         </CardContent>
@@ -175,9 +177,11 @@ export function WorkflowSelector({ onSelect, onCancel }) {
           <Button variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit}>
-            Start Chat Session
-          </Button>
+          {mode === "existing" && (
+            <Button onClick={handleSubmit} disabled={!canSubmit}>
+              Start Chat Session
+            </Button>
+          )}
         </div>
       </Card>
     </div>

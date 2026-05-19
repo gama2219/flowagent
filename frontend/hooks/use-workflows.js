@@ -65,6 +65,17 @@ export function useWorkflows() {
     }
   }
 
+  const update_thread_metadata = async (sessionid, workflow_name) => {
+    try {
+      const updatedWorkflow = await workflowService.updatethreadmetadata(sessionid, workflow_name)
+      setWorkflows((prev) => prev.map((workflow) => workflow.thread_id === sessionid ? updatedWorkflow : workflow))
+      return updatedWorkflow
+    } catch (err) {
+      console.error("Error updating workflow:", err)
+      throw err
+    }
+  }
+
 
 
   return {
@@ -75,6 +86,7 @@ export function useWorkflows() {
     getsession,
     create_session,
     // updateSession,
+    update_thread_metadata,
     deleteSession,
     refreshData: loadData,
   }
